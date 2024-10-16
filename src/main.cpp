@@ -1,17 +1,11 @@
 #include "threepp/threepp.hpp"
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-#include <GLFW/glfw3.h>
-
-
 
 using namespace threepp;
 
 namespace {
 
     std::shared_ptr<Mesh> createBox(const Vector3 &pos, const Color &color) {
-        const auto geometry = BoxGeometry::create();
+        const auto geometry                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  = BoxGeometry::create();
         const auto material = MeshBasicMaterial::create();
         material->color.copy(color);
         auto mesh = Mesh::create(geometry, material);

@@ -45,8 +45,8 @@ target_include_directories(imgui PUBLIC
 
 target_link_libraries(imgui PUBLIC threepp::threepp)
 
-
 add_executable(threepp_BOIDS src/main.cpp)
+
 target_link_libraries(threepp_BOIDS PRIVATE threepp::threepp imgui)
 target_link_libraries(imgui PUBLIC threepp::threepp glfw)
 
