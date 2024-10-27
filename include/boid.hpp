@@ -5,16 +5,23 @@
 #include <vector>
 
 class Boid {
-public:
+
+private:
     threepp::Vector3 position;  // Current position of the boid
     threepp::Vector3 velocity;  // Current velocity of the boid
     threepp::Vector3 acceleration;  // Acceleration due to forces
     float maxSpeed;  // Maximum speed the boid can reach
     float maxForce;  // Maximum steering force
 
+public:
+    void boidCalculateAcceleration(threepp::Vector3 acceleration);
+    void boidCalculateVelocity(threepp::Vector3 velocity);
+    void boidCalculatePosition(threepp::Vector3 position);
+
+/*
     // Constructor to initialize the boid with a starting position
     explicit Boid(threepp::Vector3 startPos)
-        : position(startPos),
+        : position(0, 0, 0),
           velocity(threepp::Vector3()),
           acceleration(threepp::Vector3()),
           maxSpeed(0.4f),   // Reduced speed
@@ -62,6 +69,7 @@ public:
             velocity.y *= -1;
         }
     }
+*/
 };
 
 #endif //BOID_HPP
