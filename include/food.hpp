@@ -7,7 +7,7 @@ class Food{
 
         threepp::Vector3 position;
 
-        Food();
+        spawnFood();
 
 
 };
