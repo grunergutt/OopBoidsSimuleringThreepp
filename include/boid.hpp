@@ -4,93 +4,97 @@
 #include "threepp/threepp.hpp"
 #include <random>
 
-// Hjelpefunksjon for å få en tilfeldig flyttall mellom min og maks
-inline float getRandomFloat(float min, float max) {
-    std::random_device rd;
-    std::mt19937 mt(rd());
-    std::uniform_real_distribution<float> dist(min, max);
-    return dist(mt);
+
+//gpt lagd randomfloat funksjon
+inline float getRandomFloat(float min, float max) {                             // Function to get a random float between min and max
+    static std::random_device rd;                                               // Static to initialize only once
+    static std::mt19937 mt(rd());
+    static std::uniform_real_distribution<float> dist(0.0f, 1.0f);    // Uniform distribution between 0 and 1
+
+    return min + dist(mt) * (max - min);                                     // Scale result to desired range
 }
 
 class Boid {
 
 private:
-    threepp::Vector3 position;       // Posisjon til boid
-    threepp::Vector3 velocity;       // Hastighet til boid
-    threepp::Vector3 acceleration;   // Akselerasjon til boid
-    float maxSpeed;                  // Maks hastighet
-    float maxForce;                  // Maks kraft som kan legges til akselerasjon
-    float dampingFactor;             // Dempingsfaktor for glattere bevegelse
+    threepp::Vector3 position;                                       // Position of boid
+    threepp::Vector3 velocity;                                       // Velocity of boid
+    threepp::Vector3 acceleration;                                   // Acceleration of boid
+    float maxSpeed;                                                  // Maximum speed, will create slider for this
+    float maxForce;                                                  // Maximum force applicable to acceleration, will create slider here too
+    float randomForceFactor;                                         // how much the boids move randomly, Create slidere here
+    float dampingFactor;                                             // Damping factor for smoother movement so it is less sparatic.
 
 public:
-    // Konstruktør
-    Boid() : position(threepp::Vector3(0, 0, 0)),
+
+    Boid() : position(threepp::Vector3(0, 0, 0)),              // Constructor
              velocity(threepp::Vector3(0, 0, 0)),
              acceleration(threepp::Vector3(0, 0, 0)),
-             maxSpeed(2.0),
-             maxForce(1.0),
+             maxSpeed(maxSpeed),
+             maxForce(maxForce),
+             randomForceFactor(randomForceFactor),
              dampingFactor(0.9) {}
 
-    // Metoder
-    void applyRandomForce();
-    void updateVelocity();
-    void updatePosition();
+    void boidApplyRandomForce();                                     // Method declarations
+    void boidApplyForce(const threepp::Vector3& force);              // this method will add forces calculated from flock class
+    void boidUpdateVelocity();
+    void boidUpdatePosition();
     void boidUpdateBoid();
     void boidConstrainToBorders(float width, float height, float depth);
 
-    // "Getters"
-    [[nodiscard]] const threepp::Vector3& getPosition() const;      //nodiscard for å hjelpe med bugfiks om jeg
-    [[nodiscard]] const threepp::Vector3& getVelocity() const;      //glemmer å bruke verdien etter funksjonskall
+
+    [[nodiscard]] const threepp::Vector3& getPosition() const;       // "Getters"
+    [[nodiscard]] const threepp::Vector3& getVelocity() const;       // marked nodiscard to avoid bugs if return value is unused
     [[nodiscard]] const threepp::Vector3& getAcceleration() const;
 };
 
-
-
-void Boid::applyRandomForce() {
-    // Generer en tilfeldig kraft med hver komponent mellom -0.2 og 0.2
-    threepp::Vector3 randomForce(
-        getRandomFloat(-0.2f, 0.2f),
-        getRandomFloat(-0.2f, 0.2f),
-        getRandomFloat(-0.2f, 0.2f)
+void Boid::boidApplyRandomForce() {
+    threepp::Vector3 randomForce(                                    // Generate a random force with each component between -0.2 and 0.2
+        getRandomFloat(-randomForceFactor, randomForceFactor),
+        getRandomFloat(-randomForceFactor, randomForceFactor),
+        getRandomFloat(-randomForceFactor, randomForceFactor)
     );
 
-    // Begrens den tilfeldige kraften til maxForce for å holde den innenfor akeptable mengder
-    if (randomForce.length() > maxForce) {
+    acceleration.add(randomForce);
+    if (randomForce.length() > maxForce) {                           // Limit the random force to maxForce to keep it within acceptable range
         randomForce.normalize();
         randomForce.multiplyScalar(maxForce);
     }
-    acceleration.add(randomForce);
+
 }
 
-void Boid::updateVelocity() {
-    // Oppdater hastigheten basert på akselerasjon
-    velocity.add(acceleration);
+void Boid::boidApplyForce(const threepp::Vector3& flockForce) {     // Function adds flocking forces calculated in flock class
 
-    // Begrens hastigheten til maxSpeed
-    if (velocity.length() > maxSpeed) {
+    acceleration.add(flockForce);
+    if (acceleration.length() > maxForce) {                         // Same as random force function.
+        acceleration.normalize();
+        acceleration.multiplyScalar(maxForce);
+    }
+}
+
+void Boid::boidUpdateVelocity() {
+
+    velocity.add(acceleration);                                      // Update velocity based on acceleration
+
+    if (velocity.length() > maxSpeed) {                              // Limit speed to maxSpeed
         velocity.normalize();
         velocity.multiplyScalar(maxSpeed);
     }
 }
 
-void Boid::updatePosition() {
-    // Oppdater posisjonen basert på hastigheten
-    position.add(velocity);
+void Boid::boidUpdatePosition() {
+    position.add(velocity);                                          // Update position based on velocity
 
-    // Bruk demping for å glatte ut akselerasjon, for å hindre sparadiske bevegelser som ikke er naturlige
-    acceleration.multiplyScalar(dampingFactor);
+    acceleration.multiplyScalar(dampingFactor);                      // Apply damping to smooth acceleration, to prevent unnatural, erratic motion
 }
 
 void Boid::boidUpdateBoid() {
-    // Kjede oppdateringsstegene for animasjon frame by frame
-    updateVelocity();
-    updatePosition();
+    boidUpdateVelocity();                                            // Chain update steps for animation frame by frame
+    boidUpdatePosition();
 }
 
 void Boid::boidConstrainToBorders(float width, float height, float depth) {
-
-    // Begrens posisjonen til spesifisert bredde, høyde og dybde, delt på to fordi de er begrenset av at de er
-    // Basert rundt origo
+                                                                      // Constrain position within specified width, height, and depth, centered around origin and divided by 2
 
     if (position.x >= width / 2) {
         position.x = width / 2;
@@ -119,8 +123,7 @@ void Boid::boidConstrainToBorders(float width, float height, float depth) {
     }
 }
 
-// Tilgangsmetodene fulført
-const threepp::Vector3& Boid::getPosition() const {
+const threepp::Vector3& Boid::getPosition() const {                  // Access methods for use in main if needed
     return position;
 }
 
