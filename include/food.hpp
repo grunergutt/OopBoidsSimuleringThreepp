@@ -3,11 +3,13 @@
 #include <threepp/threepp.hpp>
 
 class Food{
-    public:
+    private:
 
         threepp::Vector3 position;
 
-        spawnFood();
+        public:
+
+        void spawnFood();
 
 
 };

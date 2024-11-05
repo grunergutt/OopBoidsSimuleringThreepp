@@ -43,9 +43,9 @@ public:
     void boidConstrainToBorders(float width, float height, float depth);
 
 
-    [[nodiscard]] const threepp::Vector3& getPosition() const;       // "Getters"
-    [[nodiscard]] const threepp::Vector3& getVelocity() const;       // marked nodiscard to avoid bugs if return value is unused
-    [[nodiscard]] const threepp::Vector3& getAcceleration() const;
+    [[nodiscard]] const threepp::Vector3& boidGetPosition() const;       // "Getters"
+    [[nodiscard]] const threepp::Vector3& boidGetVelocity() const;       // marked nodiscard to avoid bugs if return value is unused
+    [[nodiscard]] const threepp::Vector3& boidGetAcceleration() const;
 };
 
 void Boid::boidApplyRandomForce() {
@@ -123,15 +123,15 @@ void Boid::boidConstrainToBorders(float width, float height, float depth) {
     }
 }
 
-const threepp::Vector3& Boid::getPosition() const {                  // Access methods for use in main if needed
+const threepp::Vector3& Boid::boidGetPosition() const {                  // Access methods for use in main if needed
     return position;
 }
 
-const threepp::Vector3& Boid::getVelocity() const {
+const threepp::Vector3& Boid::boidGetVelocity() const {
     return velocity;
 }
 
-const threepp::Vector3& Boid::getAcceleration() const {
+const threepp::Vector3& Boid::boidGetAcceleration() const {
     return acceleration;
 }
 
