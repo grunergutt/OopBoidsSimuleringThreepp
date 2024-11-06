@@ -13,7 +13,7 @@ private:
     float separationStrength;										    // How much each strength affects the group
     int separationRadius = 10;                                           // How far each boid will check for other boids when seperating.
     float alignmentStrength;										    // Will create sliders in imgui to change dynamicly in real-time
-    int alignmentRadius = 20;                                           // The Radius that boids will look at other boids dricetion
+    int alignmentRadius = 10;                                           // The Radius that boids will look at other boids dricetion
     float cohesionStrength;											    // Paired setters below will change strengths here.
     int cohesionRadius = 10;
 
@@ -30,15 +30,18 @@ public:
 	void flockAddBoid(const Boid& boid);
     //void flockRemoveBoid(const Boid& boid);							// not added or needed yet
 
-	void flockApplyFlocking();                                         	// Method to apply flocking principles
+	void flockApplyFlockingForces();                                         	// Method to apply flocking principles
     void flockUpdateFlock();                                           	// Method to update each boid in the flock
-    void flockApplyForcesToBoid();
 
     const std::vector<Boid>& getBoids() const;
 
     void setSeparationStrength(float strength) { separationStrength = strength; }
     void setAlignmentStrength(float strength) { alignmentStrength = strength; }
     void setCohesionStrength(float strength) { cohesionStrength = strength; }
+
+    void setSeparationRadius(int radius) { separationRadius = radius; }
+    void setAlignmentRadius(int radius) { alignmentRadius = radius; }
+    void setCohesionRadius(int radius) { cohesionRadius = radius; }
 
 };
 
@@ -126,15 +129,11 @@ threepp::Vector3 Flock::flockCalculateCohesion(const Boid& boid) {
     return cohesionForce;                                                       // returns threepp vector
 }
 
-void Flock::flockApplyFlocking() {
+void Flock::flockApplyFlockingForces() {
     for (auto& boid : boids) {
         threepp::Vector3 separationForce = flockCalculateSeparation(boid);  // Calculate separation force
         threepp::Vector3 alignmentForce = flockCalculateAlignment(boid);    // Calculate alignment force
         threepp::Vector3 cohesionForce = flockCalculateCohesion(boid);      // Calculate cohesion force
-
-        separationForce.multiplyScalar(separationStrength);			        // Scale each force by its respective strength
-        alignmentForce.multiplyScalar(alignmentStrength);
-        cohesionForce.multiplyScalar(cohesionStrength);
 
         boid.boidApplyForce(separationForce);						  // Apply each force to the boid’s acceleration
         boid.boidApplyForce(alignmentForce);
@@ -143,7 +142,7 @@ void Flock::flockApplyFlocking() {
 }
 
 void Flock::flockUpdateFlock() {
-    flockApplyFlocking();                    						 // Apply flocking forces to each boid
+    flockApplyFlockingForces();                    						 // Apply flocking forces to each boid
     for (auto& boid : boids) {
         boid.boidUpdateBoid();                   					 // Update position and velocity of each boid
     }

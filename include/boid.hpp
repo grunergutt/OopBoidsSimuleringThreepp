@@ -27,13 +27,14 @@ private:
 
 public:
 
-    Boid() : position(threepp::Vector3(0, 0, 0)),              // Constructor
-             velocity(threepp::Vector3(0, 0, 0)),
-             acceleration(threepp::Vector3(0, 0, 0)),
-             maxSpeed(maxSpeed),
-             maxForce(maxForce),
-             randomForceFactor(randomForceFactor),
-             dampingFactor(0.9) {}
+    Boid(float maxSpeedInitializer = 3, float maxForceInitializer = 2, float randomFactorInitializer = 0.2)     //make it so you can use default
+    : position(threepp::Vector3(0, 0, 0)),                                                                //or your own values when creating a boid
+      velocity(threepp::Vector3(0, 0, 0)),
+      acceleration(threepp::Vector3(0, 0, 0)),
+      maxSpeed(maxSpeedInitializer),
+      maxForce(maxForceInitializer),
+      randomForceFactor(randomFactorInitializer),
+      dampingFactor(0.9f) {}
 
     void boidApplyRandomForce();                                     // Method declarations
     void boidApplyForce(const threepp::Vector3& force);              // this method will add forces calculated from flock class
@@ -56,9 +57,9 @@ void Boid::boidApplyRandomForce() {
     );
 
     acceleration.add(randomForce);
-    if (randomForce.length() > maxForce) {                           // Limit the random force to maxForce to keep it within acceptable range
-        randomForce.normalize();
-        randomForce.multiplyScalar(maxForce);
+    if (acceleration.length() > maxForce) {                           // Limit the random force to maxForce to keep it within acceptable range
+        acceleration.normalize();
+        acceleration.multiplyScalar(maxForce);
     }
 
 }
@@ -80,12 +81,14 @@ void Boid::boidUpdateVelocity() {
         velocity.normalize();
         velocity.multiplyScalar(maxSpeed);
     }
+
+    velocity.multiplyScalar(dampingFactor);
 }
 
 void Boid::boidUpdatePosition() {
     position.add(velocity);                                          // Update position based on velocity
 
-    acceleration.multiplyScalar(dampingFactor);                      // Apply damping to smooth acceleration, to prevent unnatural, erratic motion
+    //acceleration.multiplyScalar(dampingFactor);                      // Apply damping to smooth acceleration, to prevent unnatural, erratic motion
 }
 
 void Boid::boidUpdateBoid() {
@@ -94,32 +97,17 @@ void Boid::boidUpdateBoid() {
 }
 
 void Boid::boidConstrainToBorders(float width, float height, float depth) {
-                                                                      // Constrain position within specified width, height, and depth, centered around origin and divided by 2
-
-    if (position.x >= width / 2) {
-        position.x = width / 2;
-    }
-    if (position.x <= -width / 2) {
-        position.x = -width / 2;
+    if (position.x >= width / 2 || position.x <= -width / 2) {
         velocity.x *= -1;
+        position.x = std::clamp(position.x, -width / 2, width / 2);
     }
-
-    if (position.y >= height) {
-        position.y = height;
+    if (position.y >= height / 2 || position.y <= -height / 2) {
         velocity.y *= -1;
+        position.y = std::clamp(position.y, -height / 2, height / 2);
     }
-    if (position.y <= 0) {
-        position.y = 0;
-        velocity.y *= -1;
-    }
-
-    if (position.z >= depth / 2) {
-        position.z = depth / 2;
+    if (position.z >= depth / 2 || position.z <= -depth / 2) {
         velocity.z *= -1;
-    }
-    if (position.z <= -depth / 2) {
-        position.z = -depth / 2;
-        velocity.z *= -1;
+        position.z = std::clamp(position.z, -depth / 2, depth / 2);
     }
 }
 
