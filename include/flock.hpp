@@ -2,6 +2,8 @@
 #define FLOCK_HPP
 
 #include "Boid.hpp"
+#include <unordered_map>
+#include <vector>
 
 
 class Flock {
@@ -9,6 +11,7 @@ class Flock {
 private:
 
     std::vector<Boid> boids;
+    std::unordered_map<std::pair<int, int>, std::vector<const Boid*>, boost::hash<std::pair<int, int>>> grid;
 
     float separationStrength;										    // How much each strength affects the group
     int separationRadius = 10;                                           // How far each boid will check for other boids when seperating.
@@ -17,15 +20,21 @@ private:
     float cohesionStrength;											    // Paired setters below will change strengths here.
     int cohesionRadius = 10;
 
+    int flockSearchCellSize  5;                                         // size of cubes each boid searches when calculation the forces above.
+
     threepp::Vector3 flockCalculateSeparation(const Boid& boid);
     threepp::Vector3 flockCalculateAlignment(const Boid& boid);
     threepp::Vector3 flockCalculateCohesion(const Boid& boid);
 
 public:
     Flock(float separation, float alignment, float cohesion)          // Constructor with strengths for each behavior
-        : separationStrength(separation),
+        : flockSearchCellSize(),
+          separationStrength(separation),
           alignmentStrength(alignment),
           cohesionStrength(cohesion) {}
+
+    void updateGrid();
+    std::pair<int, int> getCell(const threepp::Vector3& position) const;
 
 	void flockAddBoid(const Boid& boid);
     //void flockRemoveBoid(const Boid& boid);							// not added or needed yet
