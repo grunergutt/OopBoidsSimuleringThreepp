@@ -34,6 +34,7 @@ add_library(imgui STATIC
         ${imgui_SOURCE_DIR}/imgui_tables.cpp
         ${IMGUI_BACKEND_PATH}/imgui_impl_glfw.cpp
         ${IMGUI_BACKEND_PATH}/imgui_impl_opengl3.cpp
+        include/Arena.h
 )
 
 

@@ -1,17 +1,12 @@
 #include "threepp/threepp.hpp"
-#include "Boid.hpp"
-#include "flock.hpp"
+#include "arena.cpp"
+#include "boid.cpp"
+#include "flock.cpp"
 #include <cmath>
 
 
 
 int main() {
-
-/*
-    flock.setSeparationStrength(newSeparationStrength);
-    flock.setAlignmentStrength(newAlignmentStrength);
-    flock.setCohesionStrength(newCohesionStrength);
-*/
 
 
     return 0;
