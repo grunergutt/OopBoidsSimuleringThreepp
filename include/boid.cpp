@@ -69,6 +69,7 @@ void Boid::boidConstrainToBorders() {
     }
 }
 
+
 const threepp::Vector3& Boid::boidGetPosition() const {                  // Access methods for use in main if needed
     return position;
 }

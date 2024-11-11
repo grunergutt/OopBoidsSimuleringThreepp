@@ -44,10 +44,10 @@ public:
     void boidUpdateBoid();
     void boidConstrainToBorders();
 
-
     [[nodiscard]] const threepp::Vector3& boidGetPosition() const;       // "Getters"
     [[nodiscard]] const threepp::Vector3& boidGetVelocity() const;       // marked nodiscard to avoid bugs if return value is unused
     [[nodiscard]] const threepp::Vector3& boidGetAcceleration() const;
+
 };
 
 #endif // BOID_HPP

@@ -12,11 +12,11 @@ private:
     std::vector<Boid> boids;
 
     float separationStrength;										    // How much each strength affects the group
-    int separationRadius = 10;                                           // How far each boid will check for other boids when seperating.
+    int separationRadius;                                               // How far each boid will check for other boids when seperating.
     float alignmentStrength;										    // Will create sliders in imgui to change dynamicly in real-time
-    int alignmentRadius = 10;                                           // The Radius that boids will look at other boids dricetion
+    int alignmentRadius;                                                // The Radius that boids will look at other boids dricetion
     float cohesionStrength;											    // Paired setters below will change strengths here.
-    int cohesionRadius = 10;
+    int cohesionRadius;
 
     int flockSearchCellSize = 5;                                         // size of cubes each boid searches when calculation the forces above.
 
@@ -25,17 +25,18 @@ private:
     threepp::Vector3 flockCalculateCohesion(const Boid& boid);
 
 public:
-    Flock(int separationRadius, int alignmentRadius, int cohesionRadius, float separation, float alignment, float cohesion)
-        : separationStrength(separation),
-          alignmentStrength(alignment),
-          cohesionStrength(cohesion),
-          separationRadius(separationRadius),
-          alignmentRadius(alignmentRadius),
-          cohesionRadius(cohesionRadius){}
+    Flock()
+        : separationStrength(1),
+          alignmentStrength(1),
+          cohesionStrength(1),
+          separationRadius(10),
+          alignmentRadius(10),
+          cohesionRadius(10){}
 
 	void flockAddBoid(const Boid& boid);
     void flockApplyFlockingForces();                                         	// Method to apply flocking principles
-    void flockUpdateFlock();                                           	// Method to update each boid in the flock
+    void flockUpdateFlock();                                           	        // Method to update each boid in the flock
+    void flockCreateAmountBoid(int amount);
 
     const std::vector<Boid>& getBoids() const;
 

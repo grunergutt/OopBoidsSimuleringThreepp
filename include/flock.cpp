@@ -106,3 +106,4 @@ void Flock::flockUpdateFlock() {
 const std::vector<Boid>& Flock::getBoids() const {
     return boids;
 }
+
