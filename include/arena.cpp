@@ -67,3 +67,4 @@ int Arena::getArenaHeight() const {
 int Arena::getArenaDepth() const {
     return depth;
 }
+
