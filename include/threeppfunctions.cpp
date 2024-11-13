@@ -12,7 +12,7 @@ std::shared_ptr<threepp::Mesh> createBoxMesh(
     const auto geometry = threepp::BoxGeometry::create(width, height, depth);
 
     threepp::TextureLoader textureLoader;
-    auto gridTexture = textureLoader.load("C:/OOPc++/OopBoidsSimuleringThreepp/images/GridTextureForWalls/GridTextureForWalls.jpg");
+    auto gridTexture = textureLoader.load("C:/OOPc++/OopBoidsSimuleringThreepp/images/GridTextureForWalls.jpg");
 // lenket til bildet brukt.
 // https://www.google.com/search?q=grid+texture&client=opera-gx&hs=QEL&sca_esv=afec391d6f6dcabb&udm=2&biw=1495&bih=746&sxsrf=ADLYWIIVqdW75npAn1j_fHl1m5HITkInew%3A1731516787140&ei=c9k0Z9idCMHawPAPuNzQwQE&ved=0ahUKEwiYo5TY4tmJAxVBLRAIHTguNBgQ4dUDCBA&uact=5&oq=grid+texture&gs_lp=EgNpbWciDGdyaWQgdGV4dHVyZTIEECMYJzIEECMYJzIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAESLAQUP8DWMAJcAF4AJABAJgBZKAB6ASqAQM3LjG4AQPIAQD4AQGYAgKgArYBmAMAiAYBkgcDMS4xoAegKA&sclient=img#vhid=ZRxAefoxT_uRrM&vssid=mosaic
 
