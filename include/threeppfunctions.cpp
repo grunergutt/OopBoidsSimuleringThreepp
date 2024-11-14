@@ -117,6 +117,8 @@ std::shared_ptr<threepp::Mesh> createConeMeshForBoid(const threepp::Vector3 &pos
 
     coneMesh->rotation.x = -3.14159f / 2;
 
+    std::cout << "Creating cone mesh at position: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
+
     return coneMesh;
 
 }

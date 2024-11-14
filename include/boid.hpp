@@ -21,6 +21,7 @@ private:
     threepp::Vector3 position;                                       // Position of boid
     threepp::Vector3 velocity;                                       // Velocity of boid
     threepp::Vector3 acceleration;                                   // Acceleration of boid
+    int boidIdentifier;
     float maxSpeed;                                                  // Maximum speed, will create slider for this
     float maxForce;                                                  // Maximum force applicable to acceleration, will create slider here too
     float randomForceFactor;                                         // how much the boids move randomly, Create slidere here
@@ -28,10 +29,11 @@ private:
 
 public:
 
-    Boid(float maxSpeedInitializer = 3, float maxForceInitializer = 2, float randomFactorInitializer = 0.2)     //make it so you can use default
-    : position(threepp::Vector3(0, 0, 0)),                                                                //or your own values when creating a boid
+    Boid(int identifier, float maxSpeedInitializer = 0.2, float maxForceInitializer = 0.05, float randomFactorInitializer = 0.01)     //make it so you can use default
+    : position(threepp::Vector3(0, 0, 0)),                                                                  //or your own values when creating a boid
       velocity(threepp::Vector3(0, 0, 0)),
       acceleration(threepp::Vector3(0, 0, 0)),
+      boidIdentifier(identifier),
       maxSpeed(maxSpeedInitializer),
       maxForce(maxForceInitializer),
       randomForceFactor(randomFactorInitializer),
@@ -47,6 +49,7 @@ public:
     [[nodiscard]] const threepp::Vector3& boidGetPosition() const;       // "Getters"
     [[nodiscard]] const threepp::Vector3& boidGetVelocity() const;       // marked nodiscard to avoid bugs if return value is unused
     [[nodiscard]] const threepp::Vector3& boidGetAcceleration() const;
+    [[nodiscard]] int boidGetBoidIdentifier() const;
 
 };
 
