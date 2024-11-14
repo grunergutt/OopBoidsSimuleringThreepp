@@ -40,7 +40,7 @@ class Arena {
   int getArenaDepth() const;
 
 };
-int dimensions = 200;
+int dimensions = 100;
 
 Arena arena(dimensions, dimensions, dimensions, 5);
 

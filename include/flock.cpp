@@ -91,16 +91,16 @@ void Flock::flockApplyFlockingForces() {
         threepp::Vector3 alignmentForce = flockCalculateAlignment(boid);    // Calculate alignment force
         threepp::Vector3 cohesionForce = flockCalculateCohesion(boid);      // Calculate cohesion force
 
-        boid.boidApplyForce(separationForce);						  // Apply each force to the boid’s acceleration
+        boid.boidApplyForce(separationForce);						        // Apply each force to the boid’s acceleration
         boid.boidApplyForce(alignmentForce);
         boid.boidApplyForce(cohesionForce);
     }
 }
 
 void Flock::flockUpdateFlock() {
-    flockApplyFlockingForces();                    						 // Apply flocking forces to each boid
+    flockApplyFlockingForces();                    						    // Apply flocking forces to each boid
     for (auto& boid : boids) {
-        boid.boidUpdateBoid();                   					 // Update position and velocity of each boid
+        boid.boidUpdateBoid();                   					        // Update position and velocity of each boid
     }
 }
 

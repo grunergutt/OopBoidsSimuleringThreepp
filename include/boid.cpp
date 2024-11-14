@@ -42,12 +42,13 @@ void Boid::boidUpdateVelocity() {
 void Boid::boidUpdatePosition() {
     position.add(velocity);                                          // Update position based on velocity
 
-    //acceleration.multiplyScalar(dampingFactor);                      // Apply damping to smooth acceleration, to prevent unnatural, erratic motion
 }
 
 void Boid::boidUpdateBoid() {
+    boidApplyRandomForce();
     boidUpdateVelocity();                                            // Chain update steps for animation frame by frame
     boidUpdatePosition();
+    boidConstrainToBorders();
 }
 
 void Boid::boidConstrainToBorders() {
