@@ -1,6 +1,7 @@
-#include "Arena.hpp"
 #include "Flock.hpp"
+#include "Arena.hpp"
 
+#include <iostream>
 
 
 void Flock::flockAddBoid(const Boid& boid) {
@@ -104,6 +105,24 @@ void Flock::flockUpdateFlock() {
 }
 
 const std::vector<Boid>& Flock::getBoids() const {
+    if (boids.empty()) {
+        std::cerr << "Flock::getBoids: No boids found" << std::endl;
+    }
     return boids;
+}
+
+const Boid& Flock::getBoidByIndex(int index) const {
+    if (index < 0) {
+        std::cerr << "Flock::getBoidByIndex: index is negative" << std::endl;
+        throw std::out_of_range("Flock::getBoidByIndex: index is out of bounds");
+    }
+    return boids[(index)];
+}
+
+const int Flock::flockGetNumBoids() {
+    if (boids.empty()) {
+        std::cerr << "Flock::flockGetNumBoids: No boids found" << std::endl;
+    }
+        return static_cast<int>(boids.size());
 }
 

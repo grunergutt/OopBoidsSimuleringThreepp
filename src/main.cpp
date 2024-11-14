@@ -9,11 +9,18 @@
 
 int main() {
 
-    int numberOfBoids = 20;
-    Flock flock;
-    for (int i = 0; i < numberOfBoids; i++) {
+    int numberOfBoidsFlock1 = 20;
+    Flock flock1;
+    for (int i = 0; i < numberOfBoidsFlock1; i++) {
         Boid boidFlock1;
-        flock.flockAddBoid(boidFlock1);
+        flock1.flockAddBoid(boidFlock1);
+    }
+
+    int numberOfBoidsFlock2 = 30;
+    Flock flock2;
+    for (int i = 0; i < numberOfBoidsFlock2; i++) {
+        Boid boidFlock2;
+        flock2.flockAddBoid(boidFlock2);
     }
 
     threepp::Canvas canvas("threepp demo", {{"aa", 4}});
@@ -38,14 +45,14 @@ int main() {
     threepp::Vector3 zWallPosition = threepp::Vector3(-1*arena.getArenaHeight() / 2,0 , 0);
     threepp::Vector3 zeroWallPosition = threepp::Vector3(0,0 , 0);
 
-    auto group = threepp::Group::create();
-    group->add(createBoxMesh(zeroWallPosition, threepp::Color::red, 1, 1, 1, false));
-    group->add(createBoxMesh(xWallPosition, threepp::Color::green, AVBHW, AVBHW, 0, true));
-    group->add(createBoxMesh(yWallPosition, threepp::Color::green, AVBHW, 0, AVBHW, true));
-    group->add(createBoxMesh(zWallPosition, threepp::Color::green, 0, AVBHW, AVBHW, true));
-    scene->add(group);
+    auto groupWallBorders = threepp::Group::create();
+    groupWallBorders->add(createBoxMesh(zeroWallPosition, threepp::Color::red, 1, 1, 1, false));
+    groupWallBorders->add(createBoxMesh(xWallPosition, threepp::Color::green, AVBHW, AVBHW, 0, true));
+    groupWallBorders->add(createBoxMesh(yWallPosition, threepp::Color::red, AVBHW, 0, AVBHW, true));
+    groupWallBorders->add(createBoxMesh(zWallPosition, threepp::Color::blue, 0, AVBHW, AVBHW, true));
+    scene->add(groupWallBorders);
 
-    const auto hud = create2dHUD(canvas.size(), "Boid Simulation", threepp::HUD::HorizontalAlignment::LEFT, threepp::HUD::VerticalAlignment::TOP);
+    const auto hud = create2dHUD(canvas.size(), "Boid Simulation", threepp::HUD::HorizontalAlignment::RIGHT, threepp::HUD::VerticalAlignment::TOP);
 
     canvas.onWindowResize([&](const threepp::WindowSize &size) {
         camera->aspect = size.aspect();
@@ -54,9 +61,33 @@ int main() {
         hud->setSize(size);
     });
 
+    const auto flock1Group = threepp::Group::create();
+    std::vector<std::shared_ptr<threepp::Mesh>> boidCones;
+
+    for (auto i = 0; i < flock1.flockGetNumBoids(); i++) {
+
+        const Boid& boid = flock1.getBoidByIndex(i);
+        threepp::Vector3 boidPosition = boid.boidGetPosition();
+
+        auto boidCone = createConeMeshForBoid(boidPosition, threepp::Color::yellow);
+
+        flock1Group->add(boidCone);
+        boidCones.push_back(boidCone);
+    }
+
+    scene->add(flock1Group);
 
     threepp::Clock clock;
     canvas.animate([&] {
+        flock1.flockApplyFlockingForces();
+        flock1.flockUpdateFlock();
+
+        for (int i = 0; i < flock1.flockGetNumBoids(); i++) {
+            const Boid& boid = flock1.getBoidByIndex(i);
+            threepp::Vector3 boidPosition = boid.boidGetPosition();
+
+            boidCones[i]->position.copy(boidPosition);
+        }
 
         renderer.clear();
         renderer.render(*scene, *camera);

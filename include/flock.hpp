@@ -39,6 +39,8 @@ public:
     void flockCreateAmountBoid(int amount);
 
     const std::vector<Boid>& getBoids() const;
+    const Boid& getBoidByIndex(int index) const;
+    const int flockGetNumBoids();
 
     void setSeparationStrength(float strength) { separationStrength = strength; }
     void setAlignmentStrength(float strength) { alignmentStrength = strength; }

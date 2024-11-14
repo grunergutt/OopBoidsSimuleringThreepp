@@ -1,7 +1,25 @@
 #include "threeppfunctions.hpp"
+#include "arena.hpp"
 
-// Define createBoxMesh as a standalone function
-std::shared_ptr<threepp::Mesh> createBoxMesh(
+std::shared_ptr<threepp::Mesh> createLineMesh(const threepp::Vector3 &pos, float width, float height, float depth) {
+
+    auto geometry = threepp::BoxGeometry::create(
+        width > 0 ? width : 0.1f,                                                                                       // Use a small non-zero size if the dimension is intended to be zero
+        height > 0 ? height : 0.1f,                                                                                     // Ensures the mesh has visibility in that dimension
+        depth > 0 ? depth : 0.1f
+    );
+
+    auto material = threepp::MeshBasicMaterial::create();
+    material->color.copy(threepp::Color(0,0,0));
+
+    auto lineMesh = threepp::Mesh::create(geometry, material);
+
+    lineMesh->position.copy(pos);
+
+    return lineMesh;
+}
+
+std::shared_ptr<threepp::Group> createBoxMesh(
     const threepp::Vector3 &pos,
     const threepp::Color &color,
     float width,
@@ -9,23 +27,56 @@ std::shared_ptr<threepp::Mesh> createBoxMesh(
     float depth,
     bool grid
 ) {
-    const auto geometry = threepp::BoxGeometry::create(width, height, depth);
 
-    threepp::TextureLoader textureLoader;
-    auto gridTexture = textureLoader.load("C:/OOPc++/OopBoidsSimuleringThreepp/images/GridTextureForWalls.jpg");
-// lenket til bildet brukt.
-// https://www.google.com/search?q=grid+texture&client=opera-gx&hs=QEL&sca_esv=afec391d6f6dcabb&udm=2&biw=1495&bih=746&sxsrf=ADLYWIIVqdW75npAn1j_fHl1m5HITkInew%3A1731516787140&ei=c9k0Z9idCMHawPAPuNzQwQE&ved=0ahUKEwiYo5TY4tmJAxVBLRAIHTguNBgQ4dUDCBA&uact=5&oq=grid+texture&gs_lp=EgNpbWciDGdyaWQgdGV4dHVyZTIEECMYJzIEECMYJzIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAEMgUQABiABDIFEAAYgAQyBRAAGIAESLAQUP8DWMAJcAF4AJABAJgBZKAB6ASqAQM3LjG4AQPIAQD4AQGYAgKgArYBmAMAiAYBkgcDMS4xoAegKA&sclient=img#vhid=ZRxAefoxT_uRrM&vssid=mosaic
+    auto group = std::make_shared<threepp::Group>();
 
-    const auto material = threepp::MeshBasicMaterial::create();
-    if (grid) {
-        material->map = gridTexture;
-    }
+    // Create the main box geometry and material
+    auto geometry = threepp::BoxGeometry::create(width, height, depth);
+    auto material = threepp::MeshBasicMaterial::create();
     material->color.copy(color);
 
-    auto mesh = threepp::Mesh::create(geometry, material);
-    mesh->position.copy(pos);
+    auto boxMesh = threepp::Mesh::create(geometry, material);
+    boxMesh->position.copy(pos);
+    group->add(boxMesh);  // Add the box to the group
 
-    return mesh;
+    if (grid) {
+        float cellSize = arena.getCellSize();
+
+        // Create vertical grid lines along the XZ plane (aligned along the Y-axis)
+        if (height > 0) {
+            for (float x = -width / 2; x <= width / 2; x += cellSize) {
+                for (float z = -depth / 2; z <= depth / 2; z += cellSize) {
+                    threepp::Vector3 start(pos.x + x, pos.y, pos.z + z);
+                    auto lineMesh = createLineMesh(start, 0.1f, height, 0.1f);
+                    group->add(lineMesh);
+                }
+            }
+        }
+
+        // Create horizontal grid lines along the XY plane (aligned along the Z-axis)
+        if (depth > 0) {
+            for (float x = -width / 2; x <= width / 2; x += cellSize) {
+                for (float y = -height / 2; y <= height / 2; y += cellSize) {
+                    threepp::Vector3 start(pos.x + x, pos.y + y, pos.z);
+                    auto lineMesh = createLineMesh(start, 0.1f, 0.1f, depth);
+                    group->add(lineMesh);
+                }
+            }
+        }
+
+        // Create depth grid lines along the YZ plane (aligned along the X-axis)
+        if (width > 0) {
+            for (float y = -height / 2; y <= height / 2; y += cellSize) {
+                for (float z = -depth / 2; z <= depth / 2; z += cellSize) {
+                    threepp::Vector3 start(pos.x, pos.y + y, pos.z + z);
+                    auto lineMesh = createLineMesh(start, width, 0.1f, 0.1f);
+                    group->add(lineMesh);
+                }
+            }
+        }
+    }
+
+    return group;  // Return the group containing both the box and lines
 }
 
 // Define create2dHUD as a standalone function
@@ -47,4 +98,25 @@ std::unique_ptr<threepp::HUD> create2dHUD(
                               .setVerticalAlignment(verticalPlacement));
 
     return hud;
+}
+
+std::shared_ptr<threepp::Mesh> createConeMeshForBoid(const threepp::Vector3 &pos, const threepp::Color &color) {
+    float radius = 0.5f;
+    float height = 1.5f;
+    int radialSegments = 16;
+
+    auto geometry = threepp::ConeGeometry::create(radius, height, radialSegments);
+
+
+    auto material = threepp::MeshBasicMaterial::create();
+    material->color.copy(color);
+
+    auto coneMesh = threepp::Mesh::create(geometry, material);
+
+    coneMesh->position.copy(pos);
+
+    coneMesh->rotation.x = -3.14159f / 2;
+
+    return coneMesh;
+
 }
