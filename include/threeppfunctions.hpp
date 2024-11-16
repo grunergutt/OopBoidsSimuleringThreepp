@@ -32,4 +32,10 @@ std::unique_ptr<threepp::HUD> create2dHUD(
 
 std::shared_ptr<threepp::Mesh> createConeMeshForBoid(const threepp::Vector3 &pos, const threepp::Color &color);
 
+std::shared_ptr<threepp::Group> createAnimationGroup( const Flock& flock,
+    const threepp::Color& color,
+    std::vector<std::shared_ptr<threepp::Mesh>>& boidCones
+);
+
+
 #endif // THREEPPFUNCTIONS_HPP

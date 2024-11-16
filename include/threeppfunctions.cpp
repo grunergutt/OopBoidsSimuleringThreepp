@@ -122,3 +122,24 @@ std::shared_ptr<threepp::Mesh> createConeMeshForBoid(const threepp::Vector3 &pos
     return coneMesh;
 
 }
+
+std::shared_ptr<threepp::Group> createAnimationGroup(
+    Flock& flock,
+    const threepp::Color& color,
+    std::vector<std::shared_ptr<threepp::Mesh>>& boidCones)
+{
+
+    auto group = threepp::Group::create();
+
+    for (int i = 0; i < flock.flockGetNumBoids(); i++) {
+        const Boid& boid = flock.getBoidByIndex(i);
+        threepp::Vector3 boidPosition = boid.boidGetPosition();
+
+        auto boidCone = createConeMeshForBoid(boidPosition, color);
+
+        group->add(boidCone);
+        boidCones.push_back(boidCone);
+    }
+
+    return group;
+}

@@ -29,7 +29,7 @@ private:
 
 public:
 
-    Boid(int identifier, float maxSpeedInitializer = 0.2, float maxForceInitializer = 0.05, float randomFactorInitializer = 0.01)     //make it so you can use default
+    Boid(int identifier, float maxSpeedInitializer = 0.3, float maxForceInitializer = 0.4, float randomFactorInitializer = 0.01)     //make it so you can use default
     : position(threepp::Vector3(0, 0, 0)),                                                                  //or your own values when creating a boid
       velocity(threepp::Vector3(0, 0, 0)),
       acceleration(threepp::Vector3(0, 0, 0)),

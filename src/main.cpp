@@ -14,9 +14,10 @@ int main() {
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
         Boid boidFlock1(i);
         flock1.flockAddBoid(boidFlock1);
+        std::cout << "Initialized Boid ID " << boidFlock1.boidGetBoidIdentifier() << " in Flock 1" << std::endl;
     }
 
-    int numberOfBoidsFlock2 = 30;
+    int numberOfBoidsFlock2 = 1;
     Flock flock2;
     for (int i = 0; i < numberOfBoidsFlock2; i++) {
         Boid boidFlock2(i);
@@ -36,17 +37,15 @@ int main() {
     threepp::OrbitControls controls{*camera, canvas};
 
     auto scene = threepp::Scene::create();
-    scene->background = threepp::Color::aliceblue;
+    scene->background = threepp::Color::orange;
 
     float AVBHW = arena.getArenaHeight();    //arenaVisualBorderHeightWidth
 
     threepp::Vector3 xWallPosition = threepp::Vector3(0, 0, -1*arena.getArenaHeight()/2);
     threepp::Vector3 yWallPosition = threepp::Vector3(0, -1*arena.getArenaHeight() / 2, 0);
     threepp::Vector3 zWallPosition = threepp::Vector3(-1*arena.getArenaHeight() / 2,0 , 0);
-    threepp::Vector3 zeroWallPosition = threepp::Vector3(0,0 , 0);
 
     auto groupWallBorders = threepp::Group::create();
-    //groupWallBorders->add(createBoxMesh(zeroWallPosition, threepp::Color::red, 1, 1, 1, false));                                      //Fjern når ikke trengt
     groupWallBorders->add(createBoxMesh(xWallPosition, threepp::Color::green, AVBHW, AVBHW, 0, true));
     groupWallBorders->add(createBoxMesh(yWallPosition, threepp::Color::red, AVBHW, 0, AVBHW, true));
     groupWallBorders->add(createBoxMesh(zWallPosition, threepp::Color::blue, 0, AVBHW, AVBHW, true));
@@ -61,32 +60,32 @@ int main() {
         hud->setSize(size);
     });
 
-    const auto flock1Group = threepp::Group::create();
-    std::vector<std::shared_ptr<threepp::Mesh>> boidCones;
+    std::vector<std::shared_ptr<threepp::Mesh>> boidCones1;
+    std::vector<std::shared_ptr<threepp::Mesh>> boidCones2;
 
-    for (auto i = 0; i < flock1.flockGetNumBoids(); i++) {
-
-        const Boid& boid = flock1.getBoidByIndex(i);
-        threepp::Vector3 boidPosition = boid.boidGetPosition();
-
-        auto boidCone = createConeMeshForBoid(boidPosition, threepp::Color::yellow);
-
-        flock1Group->add(boidCone);
-        boidCones.push_back(boidCone);
-    }
+    auto flock1Group = createAnimationGroup(flock1, threepp::Color::yellow, boidCones1);
+    auto flock2Group = createAnimationGroup(flock2, threepp::Color::cyan, boidCones2);
 
     scene->add(flock1Group);
+    scene->add(flock2Group);
 
     threepp::Clock clock;
     canvas.animate([&] {
-        flock1.flockApplyFlockingForces();
         flock1.flockUpdateFlock();
+        flock2.flockUpdateFlock();
 
         for (int i = 0; i < flock1.flockGetNumBoids(); i++) {
             const Boid& boid = flock1.getBoidByIndex(i);
             threepp::Vector3 boidPosition = boid.boidGetPosition();
 
-            boidCones[i]->position.copy(boidPosition);
+            boidCones1[i]->position.copy(boidPosition);
+        }
+
+        for (int i = 0; i < flock2.flockGetNumBoids(); i++) {
+            const Boid& boid = flock2.getBoidByIndex(i);
+            threepp::Vector3 boidPosition = boid.boidGetPosition();
+
+            boidCones2[i]->position.copy(boidPosition);
         }
 
         renderer.clear();
