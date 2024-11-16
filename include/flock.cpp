@@ -4,10 +4,6 @@
 #include <iostream>
 
 
-void Flock::flockAddBoid(const Boid& boid) {
-    boids.push_back(boid);
-}
-
 threepp::Vector3 Flock::flockCalculateSeparation(const Boid& boid) {
     threepp::Vector3 separationForce(0.0f, 0.0f, 0.0f);
     int count = 0;
@@ -76,6 +72,10 @@ threepp::Vector3 Flock::flockCalculateCohesion(const Boid& boid) {
 
     cohesionForce *= cohesionStrength;  // Scale by cohesion strength
     return cohesionForce;
+}
+
+void Flock::flockAddBoid(const Boid& boid) {
+    boids.push_back(boid);
 }
 
 void Flock::flockApplyFlockingForces() {

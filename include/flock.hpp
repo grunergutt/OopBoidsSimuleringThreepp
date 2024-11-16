@@ -36,7 +36,6 @@ public:
 	void flockAddBoid(const Boid& boid);
     void flockApplyFlockingForces();                                         	// Method to apply flocking principles
     void flockUpdateFlock();                                           	        // Method to update each boid in the flock
-    void flockCreateAmountBoid(int amount);
 
     const std::vector<Boid>& getBoids() const;
     const Boid& getBoidByIndex(int index) const;

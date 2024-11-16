@@ -27,9 +27,10 @@ class Arena {
       zCells(static_cast<int>(std::ceil(static_cast<float>(depth) / cellSize))),
       grid(xCells, std::vector<std::vector<std::vector<const Boid*>>>(yCells, std::vector<std::vector<const Boid*>>(zCells))) {}
 
+  void clearGrid();
+
   std::tuple<int, int, int> getCellIndices(const threepp::Vector3& position) const;
 
-  void clearGrid();
   void addBoid(const Boid* boid);
 
   std::vector<const Boid*> getNeighboringBoids(const Boid& boid, int range) const;
