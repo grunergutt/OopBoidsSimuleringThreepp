@@ -1,7 +1,6 @@
 #include "arena.hpp"
-#include "flock.hpp"
-#include "threepp/threepp.hpp"
-
+#include "boid.hpp"
+#include <iostream>
 
 void Arena::clearGrid() {
     for (auto& plane : grid) {
@@ -28,21 +27,17 @@ void Arena::addBoid(const Boid* boid) {
 std::vector<const Boid*> Arena::getNeighboringBoids(const Boid& boid, int range) const {
     std::vector<const Boid*> neighbors;
     auto [x, y, z] = getCellIndices(boid.boidGetPosition());
-
-    // Define search bounds based on the range and clamp within grid bounds
     int xMin = std::max(0, x - range);
     int xMax = std::min(xCells - 1, x + range);
     int yMin = std::max(0, y - range);
     int yMax = std::min(yCells - 1, y + range);
     int zMin = std::max(0, z - range);
     int zMax = std::min(zCells - 1, z + range);
-
-    // Collect all boids in the neighboring cells
     for (int i = xMin; i <= xMax; ++i) {
         for (int j = yMin; j <= yMax; ++j) {
             for (int k = zMin; k <= zMax; ++k) {
                 for (const Boid* neighbor : grid[i][j][k]) {
-                    if (neighbor != &boid) {  // Avoid self
+                    if (neighbor != &boid) {
                         neighbors.push_back(neighbor);
                     }
                 }
@@ -68,3 +63,22 @@ int Arena::getArenaDepth() const {
     return depth;
 }
 
+void Arena::logBoidPositionsInGrid() const {
+    for (int x = 0; x < xCells; ++x) {
+        for (int y = 0; y < yCells; ++y) {
+            for (int z = 0; z < zCells; ++z) {
+                if (!grid[x][y][z].empty()) {
+                    std::cout << "Cell (" << x << ", " << y << ", " << z << ") contains:\n";
+                    for (const Boid* boid : grid[x][y][z]) {
+                        const auto& position = boid->boidGetPosition();
+                        std::cout << "  Boid ID " << boid->boidGetBoidIdentifier() << " at ("
+                                  << position.x << ", " << position.y << ", " << position.z << ")\n";
+                    }
+                }
+            }
+        }
+    }
+}
+
+int borderSizes = 100;
+Arena arena(borderSizes, borderSizes, borderSizes, 5);

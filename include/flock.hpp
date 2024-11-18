@@ -3,22 +3,18 @@
 
 #include "boid.hpp"
 #include <vector>
-
+#include <memory>
 
 class Flock {
-
 private:
-
-    std::vector<Boid> boids;
-
-    float separationStrength;										    // How much each strength affects the group
-    int separationRadius;                                               // How far each boid will check for other boids when seperating.
-    float alignmentStrength;										    // Will create sliders in imgui to change dynamicly in real-time
-    int alignmentRadius;                                                // The Radius that boids will look at other boids dricetion
-    float cohesionStrength;											    // Paired setters below will change strengths here.
+    std::vector<std::unique_ptr<Boid>> boids;
+    float separationStrength;
+    int separationRadius;
+    float alignmentStrength;
+    int alignmentRadius;
+    float cohesionStrength;
     int cohesionRadius;
-
-    int flockSearchCellSize = 5;                                         // size of cubes each boid searches when calculation the forces above.
+    int flockSearchCellSize;
 
     threepp::Vector3 flockCalculateSeparation(const Boid& boid);
     threepp::Vector3 flockCalculateAlignment(const Boid& boid);
@@ -26,29 +22,27 @@ private:
 
 public:
     Flock()
-        : separationStrength(1),
-          alignmentStrength(1),
-          cohesionStrength(1),
-          separationRadius(10),
-          alignmentRadius(10),
-          cohesionRadius(10){}
+        : separationStrength(0.01),
+          alignmentStrength(0.001),
+          cohesionStrength(0.001),
+          separationRadius(100),
+          alignmentRadius(100),
+          cohesionRadius(100) {}
 
-	void flockAddBoid(const Boid& boid);
-    void flockApplyFlockingForces();                                         	// Method to apply flocking principles
-    void flockUpdateFlock();                                           	        // Method to update each boid in the flock
+    void flockAddBoid(std::unique_ptr<Boid> boid);
+    void flockApplyFlockingForces();
+    void flockUpdateFlock();
 
-    const std::vector<Boid>& getBoids() const;
+    const std::vector<std::unique_ptr<Boid>>& getBoids() const;
     const Boid& getBoidByIndex(int index) const;
     const int flockGetNumBoids();
 
     void setSeparationStrength(float strength) { separationStrength = strength; }
     void setAlignmentStrength(float strength) { alignmentStrength = strength; }
     void setCohesionStrength(float strength) { cohesionStrength = strength; }
-
     void setSeparationRadius(int radius) { separationRadius = radius; }
     void setAlignmentRadius(int radius) { alignmentRadius = radius; }
     void setCohesionRadius(int radius) { cohesionRadius = radius; }
-
 };
 
-#endif // FLOCK_HPP
+#endif

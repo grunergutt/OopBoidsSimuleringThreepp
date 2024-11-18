@@ -28,9 +28,10 @@ private:
     float dampingFactor;                                             // Damping factor for smoother movement so it is less sparatic.
 
 public:
-
-    Boid(int identifier, float maxSpeedInitializer = 0.3, float maxForceInitializer = 0.4, float randomFactorInitializer = 0.01)     //make it so you can use default
-    : position(threepp::Vector3(0, 0, 0)),                                                                  //or your own values when creating a boid
+    Boid(int identifier, float maxSpeedInitializer = 2, float maxForceInitializer = 1, float randomFactorInitializer = 0.01)     //make it so you can use default
+    : position(threepp::Vector3(getRandomFloat(- arena.getArenaWidth()/2, arena.getArenaWidth()/2),
+        getRandomFloat(- arena.getArenaDepth()/2, arena.getArenaDepth()/2),
+        getRandomFloat(- arena.getArenaHeight()/2, arena.getArenaHeight()/2))),                                                                  //or your own values when creating a boid
       velocity(threepp::Vector3(0, 0, 0)),
       acceleration(threepp::Vector3(0, 0, 0)),
       boidIdentifier(identifier),
@@ -39,17 +40,22 @@ public:
       randomForceFactor(randomFactorInitializer),
       dampingFactor(0.9f) {}
 
+
     void boidApplyRandomForce();                                     // Method declarations
     void boidApplyForce(const threepp::Vector3& force);              // this method will add forces calculated from flock class
     void boidUpdateVelocity();
     void boidUpdatePosition();
     void boidUpdateBoid();
-    void boidConstrainToBorders();
+    void boidSteerTowardsOrigo();
+    void boidConstrainToPhysicalBorders();
+    void boidConstrainToInvisibleBorders();
 
     [[nodiscard]] const threepp::Vector3& boidGetPosition() const;       // "Getters"
     [[nodiscard]] const threepp::Vector3& boidGetVelocity() const;       // marked nodiscard to avoid bugs if return value is unused
     [[nodiscard]] const threepp::Vector3& boidGetAcceleration() const;
     [[nodiscard]] int boidGetBoidIdentifier() const;
+
+
 
 };
 

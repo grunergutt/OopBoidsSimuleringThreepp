@@ -4,10 +4,6 @@
 
 
 
-
-
-
-
 void Boid::boidApplyRandomForce() {
     threepp::Vector3 randomForce(                                    // Generate a random force with each component between -0.2 and 0.2
         getRandomFloat(-randomForceFactor, randomForceFactor),
@@ -53,25 +49,67 @@ void Boid::boidUpdateBoid() {
     boidApplyRandomForce();
     boidUpdateVelocity();                                            // Chain update steps for animation frame by frame
     boidUpdatePosition();
-    boidConstrainToBorders();
+    boidConstrainToPhysicalBorders();
+    boidConstrainToInvisibleBorders();
 }
 
-void Boid::boidConstrainToBorders() {
+void Boid::boidSteerTowardsOrigo() {
+    threepp::Vector3 origin(0, 0, 0);
+    threepp::Vector3 directionToOrigin = origin - position;
+
+    directionToOrigin.normalize();
+    float steeringForce = 0.7f;
+
+    directionToOrigin.multiplyScalar(steeringForce);
+    acceleration.multiplyScalar(steeringForce);
+    velocity.multiplyScalar(0);
+    velocity.add(directionToOrigin);
+}
+
+void Boid::boidConstrainToPhysicalBorders() {
     float width = arena.getArenaWidth();
     float height= arena.getArenaHeight();
     float depth = arena.getArenaDepth();
 
-    if (position.x >= width / 2 + 1 || position.x <= -width / 2 - 1) {
+    if (position.x >= width / 2 || position.x <= -width / 2) {
         acceleration.x *= -1;
         position.x = std::clamp(position.x, -width / 2, width / 2);
     }
-    if (position.y >= height / 2 + 1 || position.y <= -height / 2 - 1) {
+    if (position.y >= height / 2 || position.y <= -height / 2) {
         acceleration.y *= -1;
         position.y = std::clamp(position.y, -height / 2, height / 2);
     }
-    if (position.z >= depth / 2 + 1 || position.z <= -depth / 2 - 1) {
+    if (position.z >= depth / 2 || position.z <= -depth / 2 ) {
         acceleration.z *= -1;
         position.z = std::clamp(position.z, -depth / 2, depth / 2);
+    }
+}
+
+void Boid::boidConstrainToInvisibleBorders() {
+    float width = arena.getArenaWidth()*0.95;
+    float height= arena.getArenaHeight()*0.95;
+    float depth = arena.getArenaDepth()*0.95;
+    float accelerationDamper = 0.5;
+
+    bool outOfBounds = false;
+
+    if (position.x >= width / 2 || position.x <= -width / 2) {
+        acceleration.x *= accelerationDamper;
+        position.x = std::clamp(position.x, -width / 2, width / 2);
+        outOfBounds = true;
+    }
+    if (position.y >= height / 2 || position.y <= -height / 2) {
+        acceleration.y *= accelerationDamper;
+        position.y = std::clamp(position.y, -height / 2, height / 2);
+        outOfBounds = true;
+    }
+    if (position.z >= depth / 2 || position.z <= -depth / 2) {
+        acceleration.z *= accelerationDamper;
+        position.z = std::clamp(position.z, -depth / 2, depth / 2);
+        outOfBounds = true;
+    }
+    if (outOfBounds) {
+        boidSteerTowardsOrigo();
     }
 }
 

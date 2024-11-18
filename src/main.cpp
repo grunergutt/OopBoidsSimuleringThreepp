@@ -4,24 +4,22 @@
 #include "flock.cpp"
 #include "threeppfunctions.cpp"
 #include <imgui.h>
+#include <iostream>
 #include <GLFW/glfw3.h>
 
 
 int main() {
 
-    int numberOfBoidsFlock1 = 1;
+    int numberOfBoidsFlock1 = 30;
     Flock flock1;
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
-        Boid boidFlock1(i);
-        flock1.flockAddBoid(boidFlock1);
-        std::cout << "Initialized Boid ID " << boidFlock1.boidGetBoidIdentifier() << " in Flock 1" << std::endl;
+        flock1.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock2 = 1;
+    int numberOfBoidsFlock2 = 0;
     Flock flock2;
     for (int i = 0; i < numberOfBoidsFlock2; i++) {
-        Boid boidFlock2(i);
-        flock2.flockAddBoid(boidFlock2);
+        flock2.flockAddBoid(std::make_unique<Boid>(i));
     }
 
     threepp::Canvas canvas("threepp demo", {{"aa", 4}});

@@ -1,5 +1,6 @@
 #include "threeppfunctions.hpp"
 #include "arena.hpp"
+#include <iostream>
 
 std::shared_ptr<threepp::Mesh> createLineMesh(const threepp::Vector3 &pos, float width, float height, float depth) {
 
