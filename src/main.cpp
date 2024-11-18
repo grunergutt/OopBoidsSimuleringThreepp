@@ -10,16 +10,28 @@
 
 int main() {
 
-    int numberOfBoidsFlock1 = 10;
+    int numberOfBoidsFlock1 = 2;
     Flock flock1;
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
         flock1.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock2 = 10;
+    int numberOfBoidsFlock2 = 0;
     Flock flock2;
     for (int i = 0; i < numberOfBoidsFlock2; i++) {
         flock2.flockAddBoid(std::make_unique<Boid>(i));
+    }
+
+    int numberOfBoidsFlock3 = 0;
+    Flock flock3;
+    for (int i = 0; i < numberOfBoidsFlock3; i++) {
+        flock3.flockAddBoid(std::make_unique<Boid>(i));
+    }
+
+    int numberOfBoidsFlock4 = 0;
+    Flock flock4;
+    for (int i = 0; i < numberOfBoidsFlock4; i++) {
+        flock4.flockAddBoid(std::make_unique<Boid>(i));
     }
 
     threepp::Canvas canvas("threepp demo", {{"aa", 4}});
@@ -60,17 +72,25 @@ int main() {
 
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones1;
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones2;
+    std::vector<std::shared_ptr<threepp::Mesh>> boidCones3;
+    std::vector<std::shared_ptr<threepp::Mesh>> boidCones4;
 
     auto flock1Group = createAnimationGroup(flock1, threepp::Color::yellow, boidCones1);
     auto flock2Group = createAnimationGroup(flock2, threepp::Color::cyan, boidCones2);
+    auto flock3Group = createAnimationGroup(flock3, threepp::Color::red, boidCones3);
+    auto flock4Group = createAnimationGroup(flock4, threepp::Color::brown, boidCones4);
 
     scene->add(flock1Group);
     scene->add(flock2Group);
+    scene->add(flock3Group);
+    scene->add(flock4Group);
 
     threepp::Clock clock;
     canvas.animate([&] {
         flock1.flockUpdateFlock();
         flock2.flockUpdateFlock();
+        flock3.flockUpdateFlock();
+        flock4.flockUpdateFlock();
 
         for (int i = 0; i < flock1.flockGetNumBoids(); i++) {
             const Boid& boid = flock1.getBoidByIndex(i);
@@ -84,6 +104,20 @@ int main() {
             threepp::Vector3 boidPosition = boid.boidGetPosition();
 
             boidCones2[i]->position.copy(boidPosition);
+        }
+
+        for (int i = 0; i < flock3.flockGetNumBoids(); i++) {
+            const Boid& boid = flock3.getBoidByIndex(i);
+            threepp::Vector3 boidPosition = boid.boidGetPosition();
+
+            boidCones3[i]->position.copy(boidPosition);
+        }
+
+        for (int i = 0; i < flock3.flockGetNumBoids(); i++) {
+            const Boid& boid = flock3.getBoidByIndex(i);
+            threepp::Vector3 boidPosition = boid.boidGetPosition();
+
+            boidCones4[i]->position.copy(boidPosition);
         }
 
         renderer.clear();

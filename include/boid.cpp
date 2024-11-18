@@ -86,10 +86,10 @@ void Boid::boidConstrainToPhysicalBorders() {
 }
 
 void Boid::boidConstrainToInvisibleBorders() {
-    float width = arena.getArenaWidth()*0.95;
-    float height= arena.getArenaHeight()*0.95;
-    float depth = arena.getArenaDepth()*0.95;
-    float accelerationDamper = 0.5;
+    float width = arena.getArenaWidth()*0.9f;
+    float height= arena.getArenaHeight()*0.9f;
+    float depth = arena.getArenaDepth()*0.9f;
+    float accelerationDamper = 0.9;
 
     bool outOfBounds = false;
 
@@ -128,4 +128,23 @@ const threepp::Vector3& Boid::boidGetAcceleration() const {
 
 int Boid::boidGetBoidIdentifier() const {
     return boidIdentifier;
+}
+
+bool Boid::boidGetBoidOutOfBoundsCheck(Boid* boid) const {
+
+    float width = arena.getArenaWidth() * 0.9f;
+    float height = arena.getArenaHeight() * 0.9f;
+    float depth = arena.getArenaDepth() * 0.9f;
+
+
+    const threepp::Vector3& position = boid->boidGetPosition();
+
+
+    if (position.x > width / 2 || position.x < -width / 2 ||
+        position.y > height / 2 || position.y < -height / 2 ||
+        position.z > depth / 2 || position.z < -depth / 2) {
+        return true;
+        }
+
+    return false;
 }
