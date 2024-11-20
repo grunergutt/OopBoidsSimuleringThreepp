@@ -10,7 +10,7 @@
 
 int main() {
 
-    int numberOfBoidsFlock1 = 20;
+    int numberOfBoidsFlock1 = 100;
     Flock flock1;
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
         flock1.flockAddBoid(std::make_unique<Boid>(i));
@@ -77,8 +77,8 @@ int main() {
 
     auto flock1Group = createAnimationGroup(flock1, threepp::Color::yellow, boidCones1);
     auto flock2Group = createAnimationGroup(flock2, threepp::Color::cyan, boidCones2);
-    auto flock3Group = createAnimationGroup(flock3, threepp::Color::red, boidCones3);
-    auto flock4Group = createAnimationGroup(flock4, threepp::Color::brown, boidCones4);
+    auto flock3Group = createAnimationGroup(flock3, threepp::Color::purple, boidCones3);
+    auto flock4Group = createAnimationGroup(flock4, threepp::Color::orange, boidCones4);
 
     scene->add(flock1Group);
     scene->add(flock2Group);
@@ -113,8 +113,8 @@ int main() {
             boidCones3[i]->position.copy(boidPosition);
         }
 
-        for (int i = 0; i < flock3.flockGetNumBoids(); i++) {
-            const Boid& boid = flock3.getBoidByIndex(i);
+        for (int i = 0; i < flock4.flockGetNumBoids(); i++) {
+            const Boid& boid = flock4.getBoidByIndex(i);
             threepp::Vector3 boidPosition = boid.boidGetPosition();
 
             boidCones4[i]->position.copy(boidPosition);

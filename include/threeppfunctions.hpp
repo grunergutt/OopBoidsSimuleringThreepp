@@ -38,4 +38,6 @@ std::shared_ptr<threepp::Group> createAnimationGroup( const Flock& flock,
 );
 
 
+
+
 #endif // THREEPPFUNCTIONS_HPP

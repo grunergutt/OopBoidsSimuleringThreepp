@@ -9,7 +9,7 @@ threepp::Vector3 Flock::flockCalculateSeparation(const Boid& boid) {
         float distance = displacement.length();
         if (distance < separationRadius && distance > 0) {
             displacement.normalize();
-            separationForce += displacement / (distance * distance);
+            separationForce += (displacement) / (distance * distance);
             count++;
         }
     }

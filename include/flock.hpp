@@ -22,12 +22,12 @@ private:
 
 public:
     Flock()
-        : separationStrength(2),
-          alignmentStrength(0.5),
-          cohesionStrength(0.5),
-          separationRadius(100),
-          alignmentRadius(100),
-          cohesionRadius(100) {}
+        : separationStrength(10),
+          alignmentStrength(0.15),
+          cohesionStrength(0.05),
+          separationRadius(20),
+          alignmentRadius(20),
+          cohesionRadius(20) {}
 
     void flockAddBoid(std::unique_ptr<Boid> boid);
     void flockApplyFlockingForces();
