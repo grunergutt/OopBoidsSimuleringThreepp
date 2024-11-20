@@ -10,7 +10,7 @@
 
 int main() {
 
-    int numberOfBoidsFlock1 = 2;
+    int numberOfBoidsFlock1 = 20;
     Flock flock1;
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
         flock1.flockAddBoid(std::make_unique<Boid>(i));

@@ -29,7 +29,7 @@ private:
     float dampingFactor;                                             // Damping factor for smoother movement so it is less sparatic.
 
 public:
-    Boid(int identifier, bool outOfBoundsStatus = false, float maxSpeedInitializer = 2, float maxForceInitializer = 1, float randomFactorInitializer = 0.01)     //make it so you can use default
+    Boid(int identifier, bool outOfBoundsStatus = false, float maxSpeedInitializer = 0.5, float maxForceInitializer = 0.05, float randomFactorInitializer = 0.00001)     //make it so you can use default
     : position(threepp::Vector3(getRandomFloat(- arena.getArenaWidth()/2, arena.getArenaWidth()/2),
         getRandomFloat(- arena.getArenaDepth()/2, arena.getArenaDepth()/2),
         getRandomFloat(- arena.getArenaHeight()/2, arena.getArenaHeight()/2))),                                                                  //or your own values when creating a boid
@@ -48,9 +48,8 @@ public:
     void boidUpdateVelocity();
     void boidUpdatePosition();
     void boidUpdateBoid();
-    void boidSteerTowardsOrigo();
     void boidConstrainToPhysicalBorders();
-    void boidConstrainToInvisibleBorders();
+    void boidNudgeBoidAwayFromBorder();
 
     [[nodiscard]] const threepp::Vector3& boidGetPosition() const;       // "Getters"
     [[nodiscard]] const threepp::Vector3& boidGetVelocity() const;       // marked nodiscard to avoid bugs if return value is unused

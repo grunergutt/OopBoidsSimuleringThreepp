@@ -46,24 +46,10 @@ void Boid::boidUpdatePosition() {
 }
 
 void Boid::boidUpdateBoid() {
+    boidConstrainToPhysicalBorders();
     boidApplyRandomForce();
     boidUpdateVelocity();                                            // Chain update steps for animation frame by frame
     boidUpdatePosition();
-    boidConstrainToPhysicalBorders();
-    boidConstrainToInvisibleBorders();
-}
-
-void Boid::boidSteerTowardsOrigo() {
-    threepp::Vector3 origin(0, 0, 0);
-    threepp::Vector3 directionToOrigin = origin - position;
-
-    directionToOrigin.normalize();
-    float steeringForce = 0.7f;
-
-    directionToOrigin.multiplyScalar(steeringForce);
-    acceleration.multiplyScalar(steeringForce);
-    velocity.multiplyScalar(0);
-    velocity.add(directionToOrigin);
 }
 
 void Boid::boidConstrainToPhysicalBorders() {
@@ -85,34 +71,13 @@ void Boid::boidConstrainToPhysicalBorders() {
     }
 }
 
-void Boid::boidConstrainToInvisibleBorders() {
-    float width = arena.getArenaWidth()*0.9f;
-    float height= arena.getArenaHeight()*0.9f;
-    float depth = arena.getArenaDepth()*0.9f;
-    float accelerationDamper = 0.9;
+void Boid::boidNudgeBoidAwayFromBorder() {
+    float width = arena.getArenaWidth();
+    float height = arena.getArenaHeight();
+    float depth = arena.getArenaDepth();
 
-    bool outOfBounds = false;
 
-    if (position.x >= width / 2 || position.x <= -width / 2) {
-        acceleration.x *= accelerationDamper;
-        position.x = std::clamp(position.x, -width / 2, width / 2);
-        outOfBounds = true;
-    }
-    if (position.y >= height / 2 || position.y <= -height / 2) {
-        acceleration.y *= accelerationDamper;
-        position.y = std::clamp(position.y, -height / 2, height / 2);
-        outOfBounds = true;
-    }
-    if (position.z >= depth / 2 || position.z <= -depth / 2) {
-        acceleration.z *= accelerationDamper;
-        position.z = std::clamp(position.z, -depth / 2, depth / 2);
-        outOfBounds = true;
-    }
-    if (outOfBounds) {
-        boidSteerTowardsOrigo();
-    }
 }
-
 
 const threepp::Vector3& Boid::boidGetPosition() const {                  // Access methods for use in main if needed
     return position;
@@ -132,9 +97,9 @@ int Boid::boidGetBoidIdentifier() const {
 
 bool Boid::boidGetBoidOutOfBoundsCheck(Boid* boid) const {
 
-    float width = arena.getArenaWidth() * 0.9f;
-    float height = arena.getArenaHeight() * 0.9f;
-    float depth = arena.getArenaDepth() * 0.9f;
+    float width = arena.getArenaWidth() * 0.8f;
+    float height = arena.getArenaHeight() * 0.8f;
+    float depth = arena.getArenaDepth() * 0.8f;
 
 
     const threepp::Vector3& position = boid->boidGetPosition();

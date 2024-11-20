@@ -22,9 +22,9 @@ private:
 
 public:
     Flock()
-        : separationStrength(0.01),
-          alignmentStrength(0.001),
-          cohesionStrength(0.001),
+        : separationStrength(2),
+          alignmentStrength(0.5),
+          cohesionStrength(0.5),
           separationRadius(100),
           alignmentRadius(100),
           cohesionRadius(100) {}

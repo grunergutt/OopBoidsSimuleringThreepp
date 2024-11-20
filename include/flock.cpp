@@ -69,15 +69,16 @@ void Flock::flockApplyFlockingForces() {
     }
 
     // arena.logBoidPositionsInGrid();                                          //debug logging
+    float dampener = 0.01;
 
     for (auto& boid : boids) {
         if (!boid->boidGetBoidOutOfBoundsCheck(boid.get())) {
             threepp::Vector3 separationForce = flockCalculateSeparation(*boid);
             threepp::Vector3 alignmentForce = flockCalculateAlignment(*boid);
             threepp::Vector3 cohesionForce = flockCalculateCohesion(*boid);
-            boid->boidApplyForce(separationForce);
-            boid->boidApplyForce(alignmentForce);
-            boid->boidApplyForce(cohesionForce);
+            boid->boidApplyForce(separationForce*dampener);
+            boid->boidApplyForce(alignmentForce*dampener);
+            boid->boidApplyForce(cohesionForce*dampener);
         }
     }
 }
