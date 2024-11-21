@@ -127,8 +127,7 @@ std::shared_ptr<threepp::Mesh> createConeMeshForBoid(const threepp::Vector3 &pos
 std::shared_ptr<threepp::Group> createAnimationGroup(
     Flock& flock,
     const threepp::Color& color,
-    std::vector<std::shared_ptr<threepp::Mesh>>& boidCones)
-{
+    std::vector<std::shared_ptr<threepp::Mesh>>& boidCones) {
 
     auto group = threepp::Group::create();
 
@@ -144,3 +143,20 @@ std::shared_ptr<threepp::Group> createAnimationGroup(
 
     return group;
 }
+
+void rotateConeTowardsVelocity(std::shared_ptr<threepp::Mesh> boidCone, const threepp::Vector3& velocity) {                     //gpt generated, didnt understand without.
+    if (velocity.length() > 0.001f) { // Use a small threshold to avoid undefined behavior for near-zero velocities
+        // Normalize the velocity to get the direction vector
+        threepp::Vector3 direction = velocity.clone().normalize();
+
+        // Define the cone's default "forward" direction (aligned with +Y axis in its local space)
+        threepp::Vector3 defaultForward(0, 1, 0);
+
+        // Calculate the rotation quaternion that aligns the cone's default "forward" with the velocity direction
+        auto rotation = threepp::Quaternion().setFromUnitVectors(defaultForward, direction);
+
+        // Apply the rotation to the cone
+        boidCone->quaternion.copy(rotation);
+    }
+}
+

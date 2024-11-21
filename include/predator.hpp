@@ -5,16 +5,24 @@
 
 class Predator {
     private:
+        threepp::Vector3 position;
+        threepp::Vector3 velocity;
         int agression;
-
+        float speed;
+        int sightAngle;
+        int sightDistance;
 
     public:
-        void spawnPredator();
+        void predatorSpawnPredator();
+        void predatorKillPredator();
+
+        void predatorCalculateAttackPoint();
+        void predatorAttack();
+
 
     };
 
-    void Predator::spawnPredator() {
-    }
+
 
 
 #endif //PREDATOR_HPP

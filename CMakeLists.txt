@@ -45,13 +45,18 @@ target_include_directories(imgui PUBLIC
 
 target_link_libraries(imgui PUBLIC threepp::threepp)
 
-add_executable(threepp_BOIDS src/main.cpp)
+file(GLOB SRC_FILES src/*.cpp)
+add_executable(threepp_BOIDS
+        main.cpp
+        ${SRC_FILES}
+)
 
 target_link_libraries(threepp_BOIDS PRIVATE threepp::threepp imgui)
 target_link_libraries(imgui PUBLIC threepp::threepp glfw)
 
 target_include_directories(threepp_BOIDS PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_include_directories(threepp_BOIDS PRIVATE ${threepp_SOURCE_DIR}/../include)
+
 
 ######### Emscripten #######
 if (DEFINED EMSCRIPTEN)

@@ -2,6 +2,7 @@
 #define THREEPPFUNCTIONS_HPP
 
 #include "threepp/threepp.hpp"
+#include "flock.hpp"
 #include <memory>
 #include <string>
 
@@ -16,6 +17,7 @@ std::shared_ptr<threepp::Mesh> createLineMesh(
 // Declaration of createBoxMesh as a standalone function
 std::shared_ptr<threepp::Group> createBoxMesh(
     const threepp::Vector3 &pos,
+    const threepp::Color &color,
     float width = 1.0f,
     float height = 1.0f,
     float depth = 1.0f,
@@ -32,11 +34,13 @@ std::unique_ptr<threepp::HUD> create2dHUD(
 
 std::shared_ptr<threepp::Mesh> createConeMeshForBoid(const threepp::Vector3 &pos, const threepp::Color &color);
 
-std::shared_ptr<threepp::Group> createAnimationGroup( const Flock& flock,
+std::shared_ptr<threepp::Group> createAnimationGroup(
+    Flock& flock,
     const threepp::Color& color,
     std::vector<std::shared_ptr<threepp::Mesh>>& boidCones
 );
 
+void rotateConeTowardsVelocity(std::shared_ptr<threepp::Mesh> boidCone, const threepp::Vector3& velocity);
 
 
 

@@ -2,7 +2,7 @@
 #include "arena.hpp"
 #include "threepp/threepp.hpp"
 
-
+float borderInvisiblePercentage = 0.85;
 
 void Boid::boidApplyRandomForce() {
     threepp::Vector3 randomForce(                                    // Generate a random force with each component between -0.2 and 0.2
@@ -72,10 +72,20 @@ void Boid::boidConstrainToPhysicalBorders() {
 }
 
 void Boid::boidNudgeBoidAwayFromBorder() {
-    float width = arena.getArenaWidth();
-    float height = arena.getArenaHeight();
-    float depth = arena.getArenaDepth();
 
+    float width = arena.getArenaWidth() * borderInvisiblePercentage;
+    float height = arena.getArenaHeight() * borderInvisiblePercentage;
+    float depth = arena.getArenaDepth() * borderInvisiblePercentage;
+    threepp::Vector3 repulsionForce = threepp::Vector3();
+
+
+    if (position.x >= width / 2 || position.x <= -width / 2) {
+
+    }
+
+}
+
+void Boid::boidFleeFromPredator() {
 
 }
 
@@ -97,9 +107,9 @@ int Boid::boidGetBoidIdentifier() const {
 
 bool Boid::boidGetBoidOutOfBoundsCheck(Boid* boid) const {
 
-    float width = arena.getArenaWidth() * 0.8f;
-    float height = arena.getArenaHeight() * 0.8f;
-    float depth = arena.getArenaDepth() * 0.8f;
+    float width = arena.getArenaWidth() * borderInvisiblePercentage;
+    float height = arena.getArenaHeight() * borderInvisiblePercentage;
+    float depth = arena.getArenaDepth() * borderInvisiblePercentage;
 
 
     const threepp::Vector3& position = boid->boidGetPosition();
@@ -113,3 +123,10 @@ bool Boid::boidGetBoidOutOfBoundsCheck(Boid* boid) const {
 
     return false;
 }
+
+int Boid::boidCalculateFearFactor() const {
+    return 0;
+}
+
+
+

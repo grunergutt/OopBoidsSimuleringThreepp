@@ -69,7 +69,7 @@ void Flock::flockApplyFlockingForces() {
     }
 
     // arena.logBoidPositionsInGrid();                                          //debug logging
-    float dampener = 0.01;
+    float dampener = 0.1;
 
     for (auto& boid : boids) {
         if (!boid->boidGetBoidOutOfBoundsCheck(boid.get())) {
@@ -79,6 +79,9 @@ void Flock::flockApplyFlockingForces() {
             boid->boidApplyForce(separationForce*dampener);
             boid->boidApplyForce(alignmentForce*dampener);
             boid->boidApplyForce(cohesionForce*dampener);
+        }
+        else if(boid->boidGetBoidOutOfBoundsCheck(boid.get())){
+            boid->boidNudgeBoidAwayFromBorder();
         }
     }
 }
