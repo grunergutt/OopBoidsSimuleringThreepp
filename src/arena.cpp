@@ -80,5 +80,6 @@ void Arena::logBoidPositionsInGrid() const {
     }
 }
 
-int borderSizes = 50;
-Arena arena(borderSizes, borderSizes, borderSizes, 5);
+int borderSizes = 200;
+
+extern Arena arena(borderSizes, borderSizes, borderSizes, 5);

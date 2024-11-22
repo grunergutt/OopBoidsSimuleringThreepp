@@ -2,7 +2,7 @@
 #include "arena.hpp"
 #include "threepp/threepp.hpp"
 
-float borderInvisiblePercentage = 0.85;
+float borderInvisiblePercentage = 1;                                 // between 0 and 1
 
 void Boid::boidApplyRandomForce() {
     threepp::Vector3 randomForce(                                    // Generate a random force with each component between -0.2 and 0.2

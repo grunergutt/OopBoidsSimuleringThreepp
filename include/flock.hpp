@@ -24,7 +24,7 @@ public:
     Flock()
         : separationStrength(10),
           alignmentStrength(0.15),
-          cohesionStrength(0.05),
+          cohesionStrength(0.1),
           separationRadius(20),
           alignmentRadius(20),
           cohesionRadius(20) {}

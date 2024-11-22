@@ -3,18 +3,11 @@
 
 #include "threepp/threepp.hpp"
 #include "arena.hpp"
-#include <random>
+#include "threeppfunctions.hpp"
 
 class Arena;
 
-//gpt lagd randomfloat funksjon
-inline float getRandomFloat(float min, float max) {                             // Function to get a random float between min and max
-    static std::random_device rd;                                               // Static to initialize only once
-    static std::mt19937 mt(rd());
-    static std::uniform_real_distribution<float> dist(0.0f, 1.0f);    // Uniform distribution between 0 and 1
 
-    return min + dist(mt) * (max - min);                                     // Scale result to desired range
-}
 
 class Boid {
 
@@ -31,8 +24,9 @@ private:
     float dampingFactor;                                             // Damping factor for smoother movement so it is less sparatic.
 
 public:
-    Boid(int identifier, bool outOfBoundsStatus = false, float maxSpeedInitializer = 0.1, float maxForceInitializer = 0.05, float randomFactorInitializer = 0.001)     //make it so you can use default
-    : position(threepp::Vector3(getRandomFloat(- arena.getArenaWidth()/2, arena.getArenaWidth()/2),
+    Boid(int identifier, bool outOfBoundsStatus = false, float maxSpeedInitializer = 0.5, float maxForceInitializer = 0.05, float randomFactorInitializer = 0.005)     //make it so you can use default
+    : position(threepp::Vector3(
+        getRandomFloat(- arena.getArenaWidth()/2, arena.getArenaWidth()/2),
         getRandomFloat(- arena.getArenaDepth()/2, arena.getArenaDepth()/2),
         getRandomFloat(- arena.getArenaHeight()/2, arena.getArenaHeight()/2))),                                                                  //or your own values when creating a boid
       velocity(threepp::Vector3(0, 0, 0)),

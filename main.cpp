@@ -16,7 +16,7 @@ int main() {
         flock1.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock2 = 2;
+    int numberOfBoidsFlock2 = 0;
     Flock flock2;
     for (int i = 0; i < numberOfBoidsFlock2; i++) {
         flock2.flockAddBoid(std::make_unique<Boid>(i));
@@ -74,11 +74,12 @@ int main() {
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones2;
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones3;
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones4;
+    std::vector<std::shared_ptr<threepp::Mesh>> Predators;
 
-    auto flock1Group = createAnimationGroup(flock1, threepp::Color::yellow, boidCones1);
-    auto flock2Group = createAnimationGroup(flock2, threepp::Color::cyan, boidCones2);
-    auto flock3Group = createAnimationGroup(flock3, threepp::Color::purple, boidCones3);
-    auto flock4Group = createAnimationGroup(flock4, threepp::Color::orange, boidCones4);
+    auto flock1Group = createAnimationGroup(flock1, threepp::Color::yellow, boidCones1, 1);
+    auto flock2Group = createAnimationGroup(flock2, threepp::Color::cyan, boidCones2, 1);
+    auto flock3Group = createAnimationGroup(flock3, threepp::Color::purple, boidCones3, 1);
+    auto flock4Group = createAnimationGroup(flock4, threepp::Color::orange, boidCones4, 1);
 
     scene->add(flock1Group);
     scene->add(flock2Group);

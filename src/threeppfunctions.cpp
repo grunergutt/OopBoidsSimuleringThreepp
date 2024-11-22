@@ -1,5 +1,6 @@
 #include "threeppfunctions.hpp"
 #include "arena.hpp"
+#include "flock.hpp"
 #include <iostream>
 
 std::shared_ptr<threepp::Mesh> createLineMesh(const threepp::Vector3 &pos, float width, float height, float depth) {
@@ -101,9 +102,9 @@ std::unique_ptr<threepp::HUD> create2dHUD(
     return hud;
 }
 
-std::shared_ptr<threepp::Mesh> createConeMeshForBoid(const threepp::Vector3 &pos, const threepp::Color &color) {
-    float radius = 0.5f;
-    float height = 1.5f;
+std::shared_ptr<threepp::Mesh> createConeMeshForObject(const threepp::Vector3 &pos, const threepp::Color &color, int size) {
+    float radius = 0.5f * size;
+    float height = 1.5f * size;
     int radialSegments = 16;
 
     auto geometry = threepp::ConeGeometry::create(radius, height, radialSegments);
@@ -127,7 +128,9 @@ std::shared_ptr<threepp::Mesh> createConeMeshForBoid(const threepp::Vector3 &pos
 std::shared_ptr<threepp::Group> createAnimationGroup(
     Flock& flock,
     const threepp::Color& color,
-    std::vector<std::shared_ptr<threepp::Mesh>>& boidCones) {
+    std::vector<std::shared_ptr<threepp::Mesh>>& boidCones,
+    int size)
+{
 
     auto group = threepp::Group::create();
 
@@ -135,7 +138,7 @@ std::shared_ptr<threepp::Group> createAnimationGroup(
         const Boid& boid = flock.getBoidByIndex(i);
         threepp::Vector3 boidPosition = boid.boidGetPosition();
 
-        auto boidCone = createConeMeshForBoid(boidPosition, color);
+        auto boidCone = createConeMeshForObject(boidPosition, color, size);
 
         group->add(boidCone);
         boidCones.push_back(boidCone);
@@ -160,3 +163,11 @@ void rotateConeTowardsVelocity(std::shared_ptr<threepp::Mesh> boidCone, const th
     }
 }
 
+//gpt lagd randomfloat funksjon
+float getRandomFloat(float min, float max) {
+    static std::random_device rd;       // Static to initialize only once
+    static std::mt19937 mt(rd());       // Mersenne Twister random number generator
+
+    std::uniform_real_distribution<float> dist(min, max); // Define range dynamically
+    return dist(mt);  // Generate and return random number within the range
+}
