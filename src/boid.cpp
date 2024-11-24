@@ -1,8 +1,6 @@
 #include "boid.hpp"
-#include "arena.hpp"
-#include "threepp/threepp.hpp"
 
-float borderInvisiblePercentage = 1;                                 // between 0 and 1
+float borderInvisiblePercentage = 0.85;                                 // between 0 and 1
 
 void Boid::boidApplyRandomForce() {
     threepp::Vector3 randomForce(                                    // Generate a random force with each component between -0.2 and 0.2
@@ -47,6 +45,7 @@ void Boid::boidUpdatePosition() {
 
 void Boid::boidUpdateBoid() {
     boidConstrainToPhysicalBorders();
+    //boidNudgeBoidAwayFromBorder();
     boidApplyRandomForce();
     boidUpdateVelocity();                                            // Chain update steps for animation frame by frame
     boidUpdatePosition();
@@ -72,17 +71,36 @@ void Boid::boidConstrainToPhysicalBorders() {
 }
 
 void Boid::boidNudgeBoidAwayFromBorder() {
-
     float width = arena.getArenaWidth() * borderInvisiblePercentage;
     float height = arena.getArenaHeight() * borderInvisiblePercentage;
     float depth = arena.getArenaDepth() * borderInvisiblePercentage;
-    threepp::Vector3 repulsionForce = threepp::Vector3();
 
+    threepp::Vector3 origo(0, 0, 0);
+    threepp::Vector3 repulsionForce(0, 0, 0);
 
-    if (position.x >= width / 2 || position.x <= -width / 2) {
-
+    // X-Axis repulsion
+    if (position.x >= width / 2 ) {
+        repulsionForce.x = -1.0f * (width / 2 - position.x) / width; // Push left
+    } else if (position.x <= -width / 2 ) {
+        repulsionForce.x = 1.0f * (-width / 2 - position.x) / width; // Push right
     }
 
+    // Y-Axis repulsion
+    if (position.y >= height / 2 ) {
+        repulsionForce.y = -1.0f * (height / 2 - position.y) / height; // Push down
+    } else if (position.y <= -height / 2 ) {
+        repulsionForce.y = 1.0f * (-height / 2 - position.y) / height; // Push up
+    }
+
+    // Z-Axis repulsion
+    if (position.z >= depth / 2) {
+        repulsionForce.z = -1.0f * (depth / 2 - position.z) / depth; // Push back
+    } else if (position.z <= -depth / 2) {
+        repulsionForce.z = 1.0f * (-depth / 2 - position.z) / depth; // Push forward
+    }
+
+    // Apply repulsion force to acceleration
+    acceleration += repulsionForce;
 }
 
 void Boid::boidFleeFromPredator() {
@@ -125,6 +143,14 @@ bool Boid::boidGetBoidOutOfBoundsCheck(Boid* boid) const {
 }
 
 int Boid::boidCalculateFearFactor() const {
+    threepp::Vector3 Distance(0,0, 0);
+    int fearAmount = 0;
+    std::vector<std::unique_ptr<Predator>> predators = predator.predatorGetPredators;
+
+    for (auto& predator : predators)
+    Distance = position -
+
+    boidSetFearFactor(fearAmount)
     return 0;
 }
 

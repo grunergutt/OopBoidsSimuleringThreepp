@@ -5,6 +5,7 @@
 #include "arena.hpp"
 
 
+class Boid;
 
 class Predator {
     private:
@@ -48,6 +49,7 @@ class Predator {
         const threepp::Vector3& predatorGetPosition() const;
 
         const int predatorCalculateSightAngle() const;
+
         void setPredatorSightDistance(int distance){sightDistance = distance;};
         void setPredatorAgression(int agressionLevel){agression = agressionLevel;};
 

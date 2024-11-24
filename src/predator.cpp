@@ -1,7 +1,6 @@
 #include  "predator.hpp"
-#include "boid.hpp"
-#include "arena.hpp"
-#include "threeppfunctions.hpp"
+
+
 
 void predatorSpawnPredator();
 void predatorKillPredator();
@@ -31,4 +30,8 @@ void Predator::predatorConstrainToPhysicalBorder() {
 
 const threepp::Vector3& Predator::predatorGetPosition() const{
     return position;
+}
+
+const int Predator::predatorCalculateSightAngle() const {
+    return 0;
 }

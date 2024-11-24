@@ -4,6 +4,7 @@
 #include "threepp/threepp.hpp"
 #include "arena.hpp"
 #include "threeppfunctions.hpp"
+#include "pack.hpp"
 
 class Arena;
 
@@ -15,7 +16,7 @@ private:
     threepp::Vector3 position;                                       // Position of boid
     threepp::Vector3 velocity;                                       // Velocity of boid
     threepp::Vector3 acceleration;                                   // Acceleration of boid
-    float fearFactor;
+    int fearFactor;
     int boidIdentifier;
     bool boidOutOfBounds;
     float maxSpeed;                                                  // Maximum speed, will create slider for this
@@ -24,7 +25,7 @@ private:
     float dampingFactor;                                             // Damping factor for smoother movement so it is less sparatic.
 
 public:
-    Boid(int identifier, bool outOfBoundsStatus = false, float maxSpeedInitializer = 0.5, float maxForceInitializer = 0.05, float randomFactorInitializer = 0.005)     //make it so you can use default
+    Boid(int identifier, bool outOfBoundsStatus = false, float maxSpeedInitializer = 0.25, float maxForceInitializer = 0.05, float randomFactorInitializer = 0.005)     //make it so you can use default
     : position(threepp::Vector3(
         getRandomFloat(- arena.getArenaWidth()/2, arena.getArenaWidth()/2),
         getRandomFloat(- arena.getArenaDepth()/2, arena.getArenaDepth()/2),
@@ -60,6 +61,7 @@ public:
     void boidSetMaxForce(float setMaxForce) {maxForce = setMaxForce;}
     void boidSetRandomForce(float setRandomForceFactor) {randomForceFactor = setRandomForceFactor;}
     void boidSetDampingFactor(float setDampingFactor) {dampingFactor = setDampingFactor;}
+    void boidSetFearFactor(int setFearFactor) {fearFactor = setFearFactor;}
 
 
 

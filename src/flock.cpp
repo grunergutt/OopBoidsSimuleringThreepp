@@ -81,13 +81,12 @@ void Flock::flockApplyFlockingForces() {
             boid->boidApplyForce(cohesionForce*dampener);
         }
         else if(boid->boidGetBoidOutOfBoundsCheck(boid.get())){
-            boid->boidNudgeBoidAwayFromBorder();
             threepp::Vector3 separationForce = flockCalculateSeparation(*boid);
             threepp::Vector3 alignmentForce = flockCalculateAlignment(*boid);
             threepp::Vector3 cohesionForce = flockCalculateCohesion(*boid);
-            boid->boidApplyForce(separationForce*dampener*dampener*dampener);
-            boid->boidApplyForce(alignmentForce*dampener*dampener*dampener);
-            boid->boidApplyForce(cohesionForce*dampener*dampener*dampener);
+            boid->boidApplyForce(separationForce*dampener*dampener);
+            boid->boidApplyForce(alignmentForce*dampener*dampener);
+            boid->boidApplyForce(cohesionForce*dampener*dampener);
         }
     }
 }
