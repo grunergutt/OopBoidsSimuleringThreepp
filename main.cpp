@@ -3,6 +3,7 @@
 #include "boid.hpp"
 #include "flock.hpp"
 #include "threeppfunctions.hpp"
+#include "pack.hpp"
 #include <imgui.h>
 #include <iostream>
 #include <GLFW/glfw3.h>
@@ -34,6 +35,12 @@ int main() {
         flock4.flockAddBoid(std::make_unique<Boid>(i));
     }
 
+    int numberOfPredatorsPack1 = 5;
+    Pack pack1;
+    for (int i = 0; i < numberOfPredatorsPack1; i++) {
+        pack1.packAddPredator(std::make_unique<Predator>(i));
+    }
+
     threepp::Canvas canvas("threepp demo", {{"aa", 4}});
     threepp::GLRenderer renderer(canvas.size());
     renderer.autoClear = false;
@@ -57,7 +64,7 @@ int main() {
 
     auto groupWallBorders = threepp::Group::create();
     groupWallBorders->add(createBoxMesh(xWallPosition, threepp::Color::green, AVBHW, AVBHW, 0, true));
-    groupWallBorders->add(createBoxMesh(yWallPosition, threepp::Color::red, AVBHW, 0, AVBHW, true));
+    groupWallBorders->add(createBoxMesh(yWallPosition, threepp::Color::purple, AVBHW, 0, AVBHW, true));
     groupWallBorders->add(createBoxMesh(zWallPosition, threepp::Color::blue, 0, AVBHW, AVBHW, true));
     scene->add(groupWallBorders);
 
@@ -74,17 +81,19 @@ int main() {
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones2;
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones3;
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones4;
-    std::vector<std::shared_ptr<threepp::Mesh>> Predators;
+    std::vector<std::shared_ptr<threepp::Mesh>> predators;
 
-    auto flock1Group = createAnimationGroup(flock1, threepp::Color::yellow, boidCones1, 1);
-    auto flock2Group = createAnimationGroup(flock2, threepp::Color::cyan, boidCones2, 1);
-    auto flock3Group = createAnimationGroup(flock3, threepp::Color::purple, boidCones3, 1);
-    auto flock4Group = createAnimationGroup(flock4, threepp::Color::orange, boidCones4, 1);
+    auto flock1Group = createAnimationGroupForFlock(flock1, threepp::Color::yellow, boidCones1, 1);
+    auto flock2Group = createAnimationGroupForFlock(flock2, threepp::Color::cyan, boidCones2, 1);
+    auto flock3Group = createAnimationGroupForFlock(flock3, threepp::Color::purple, boidCones3, 1);
+    auto flock4Group = createAnimationGroupForFlock(flock4, threepp::Color::orange, boidCones4, 1);
+    auto predatorsGroup = createAnimationGroupForPack(pack1, threepp::Color::red, predators, 4);
 
     scene->add(flock1Group);
     scene->add(flock2Group);
     scene->add(flock3Group);
     scene->add(flock4Group);
+    scene->add(predatorsGroup);
 
     threepp::Clock clock;
     canvas.animate([&] {

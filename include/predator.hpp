@@ -1,11 +1,10 @@
 #ifndef PREDATOR_HPP
 #define PREDATOR_HPP
+
 #include <threepp/threepp.hpp>
-#include "threeppfunctions.hpp"
 #include "arena.hpp"
-
-
-class Boid;
+#include "utilityfunctions.hpp"
+#include <memory>
 
 class Predator {
     private:
@@ -14,6 +13,7 @@ class Predator {
         threepp::Vector3 position;
         threepp::Vector3 velocity;
         threepp::Vector3 acceleration;
+        int identifier;
         int agression;
         bool attacking;
         float speed;
@@ -21,10 +21,12 @@ class Predator {
         int sightDistance;
 
     public:
-    Predator(bool attackingStatus, float speed, int fieldOfView)
+
+    Predator(int predatorIdentifier, bool attackingStatus = false, float speed = 0.25, int fieldOfView = 180)
     : position(threepp::Vector3(0, 0, 0)),
       velocity(threepp::Vector3(0, 0, 0)),
       acceleration(threepp::Vector3(0, 0, 0)),
+      identifier(predatorIdentifier),
       agression(0),
       attacking(attackingStatus),
       speed(speed),

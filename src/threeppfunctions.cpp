@@ -1,6 +1,9 @@
 #include "threeppfunctions.hpp"
 #include "arena.hpp"
 #include "flock.hpp"
+#include "boid.hpp"
+#include "predator.hpp"
+#include "pack.hpp"
 #include <iostream>
 
 std::shared_ptr<threepp::Mesh> createLineMesh(const threepp::Vector3 &pos, float width, float height, float depth) {
@@ -125,7 +128,7 @@ std::shared_ptr<threepp::Mesh> createConeMeshForObject(const threepp::Vector3 &p
 
 }
 
-std::shared_ptr<threepp::Group> createAnimationGroup(
+std::shared_ptr<threepp::Group> createAnimationGroupForFlock(
     Flock& flock,
     const threepp::Color& color,
     std::vector<std::shared_ptr<threepp::Mesh>>& boidCones,
@@ -147,6 +150,28 @@ std::shared_ptr<threepp::Group> createAnimationGroup(
     return group;
 }
 
+std::shared_ptr<threepp::Group> createAnimationGroupForPack(
+    Pack& pack,
+    const threepp::Color& color,
+    std::vector<std::shared_ptr<threepp::Mesh>>& predatorCones,
+    int size)
+{
+
+    auto group = threepp::Group::create();
+
+    for (int i = 0; i < pack.packGetNumPredators(); i++) {
+        const Predator& predator = pack.packGetPredatorByIndex(i);
+        threepp::Vector3 predatorPosition = predator.predatorGetPosition();
+
+        auto boidCone = createConeMeshForObject(predatorPosition, color, size);
+
+        group->add(boidCone);
+        predatorCones.push_back(boidCone);
+    }
+
+    return group;
+}
+
 void rotateConeTowardsVelocity(std::shared_ptr<threepp::Mesh> boidCone, const threepp::Vector3& velocity) {                     //gpt generated, didnt understand without.
     if (velocity.length() > 0.001f) { // Use a small threshold to avoid undefined behavior for near-zero velocities
         // Normalize the velocity to get the direction vector
@@ -161,13 +186,4 @@ void rotateConeTowardsVelocity(std::shared_ptr<threepp::Mesh> boidCone, const th
         // Apply the rotation to the cone
         boidCone->quaternion.copy(rotation);
     }
-}
-
-//gpt lagd randomfloat funksjon
-float getRandomFloat(float min, float max) {
-    static std::random_device rd;       // Static to initialize only once
-    static std::mt19937 mt(rd());       // Mersenne Twister random number generator
-
-    std::uniform_real_distribution<float> dist(min, max); // Define range dynamically
-    return dist(mt);  // Generate and return random number within the range
 }

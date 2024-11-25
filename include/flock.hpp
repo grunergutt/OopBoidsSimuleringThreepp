@@ -1,9 +1,11 @@
 #ifndef FLOCK_HPP
 #define FLOCK_HPP
 
-#include "boid.hpp"
+#include "threepp/threepp.hpp"
 #include <vector>
 #include <memory>
+
+class Boid;
 
 class Flock {
 private:

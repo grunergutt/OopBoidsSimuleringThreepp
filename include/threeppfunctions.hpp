@@ -2,10 +2,9 @@
 #define THREEPPFUNCTIONS_HPP
 
 #include "threepp/threepp.hpp"
-#include <memory>
-#include <string>
-#include "random"
 
+
+class Pack;
 class Flock;
 
 std::shared_ptr<threepp::Mesh> createLineMesh(
@@ -36,16 +35,21 @@ std::unique_ptr<threepp::HUD> create2dHUD(
 
 std::shared_ptr<threepp::Mesh> createConeMeshForObject(const threepp::Vector3 &pos, const threepp::Color &color, int size);
 
-std::shared_ptr<threepp::Group> createAnimationGroup(
+std::shared_ptr<threepp::Group> createAnimationGroupForFlock(
     Flock& flock,
     const threepp::Color& color,
     std::vector<std::shared_ptr<threepp::Mesh>>& boidCones,
     int size
 );
 
-void rotateConeTowardsVelocity(std::shared_ptr<threepp::Mesh> boidCone, const threepp::Vector3& velocity);
+std::shared_ptr<threepp::Group> createAnimationGroupForPack(
+    Pack& pack,
+    const threepp::Color& color,
+    std::vector<std::shared_ptr<threepp::Mesh>>& predatorCones,
+    int size
+);
 
-float getRandomFloat(float min, float max);
+void rotateConeTowardsVelocity(std::shared_ptr<threepp::Mesh> boidCone, const threepp::Vector3& velocity);
 
 
 

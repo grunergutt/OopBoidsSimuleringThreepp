@@ -1,5 +1,6 @@
 #include "flock.hpp"
 #include "arena.hpp"
+#include "boid.hpp"
 
 threepp::Vector3 Flock::flockCalculateSeparation(const Boid& boid) {
     threepp::Vector3 separationForce(0.0f, 0.0f, 0.0f);
@@ -68,26 +69,30 @@ void Flock::flockApplyFlockingForces() {
         arena.addBoid(boid.get());
     }
 
-    // arena.logBoidPositionsInGrid();                                          //debug logging
-    float dampener = 0.1;
+    float dampener = 0.1f;
+    float scaredDampener = 0.05f;
 
     for (auto& boid : boids) {
-        if (!boid->boidGetBoidOutOfBoundsCheck(boid.get())) {
-            threepp::Vector3 separationForce = flockCalculateSeparation(*boid);
-            threepp::Vector3 alignmentForce = flockCalculateAlignment(*boid);
-            threepp::Vector3 cohesionForce = flockCalculateCohesion(*boid);
-            boid->boidApplyForce(separationForce*dampener);
-            boid->boidApplyForce(alignmentForce*dampener);
-            boid->boidApplyForce(cohesionForce*dampener);
+        threepp::Vector3 separationForce = flockCalculateSeparation(*boid);
+        threepp::Vector3 alignmentForce = flockCalculateAlignment(*boid);
+        threepp::Vector3 cohesionForce = flockCalculateCohesion(*boid);
+
+        if (boid->boidGetBoidScaredCheck()) {
+            // Scared boids
+            separationForce *= scaredDampener * 0.5f;
+            alignmentForce *= scaredDampener;
+            cohesionForce *= scaredDampener;
         }
-        else if(boid->boidGetBoidOutOfBoundsCheck(boid.get())){
-            threepp::Vector3 separationForce = flockCalculateSeparation(*boid);
-            threepp::Vector3 alignmentForce = flockCalculateAlignment(*boid);
-            threepp::Vector3 cohesionForce = flockCalculateCohesion(*boid);
-            boid->boidApplyForce(separationForce*dampener*dampener);
-            boid->boidApplyForce(alignmentForce*dampener*dampener);
-            boid->boidApplyForce(cohesionForce*dampener*dampener);
+
+        if (boid->boidGetBoidOutOfBoundsCheck(boid.get())) {
+
+            cohesionForce *= 1.5f;
+            alignmentForce *= 0.75f;
         }
+
+        boid->boidApplyForce(separationForce * dampener);
+        boid->boidApplyForce(alignmentForce * dampener);
+        boid->boidApplyForce(cohesionForce * dampener);
     }
 }
 

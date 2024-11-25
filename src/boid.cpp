@@ -1,4 +1,26 @@
 #include "boid.hpp"
+#include "pack.hpp"
+#include "predator.hpp"
+#include "utilityfunctions.hpp"
+
+Boid::Boid(int identifier, int sightRangeInitializer, bool outOfBoundsStatus,  bool boidScaredStatus,
+           float maxSpeedInitializer, float maxForceInitializer,
+           float randomFactorInitializer)
+:   position{threepp::Vector3{
+         getRandomFloat(-arena.getArenaWidth() / 2, arena.getArenaWidth() / 2),
+         getRandomFloat(-arena.getArenaHeight() / 2, arena.getArenaHeight() / 2),
+         getRandomFloat(-arena.getArenaDepth() / 2, arena.getArenaDepth() / 2)}},
+    velocity{threepp::Vector3{0, 0, 0}},
+    acceleration{threepp::Vector3{0, 0, 0}},
+      fearFactor(0),
+      sightRange(sightRangeInitializer),
+      boidIdentifier(identifier),
+      boidOutOfBounds(outOfBoundsStatus),
+      boidScared(boidScaredStatus),
+      maxSpeed(maxSpeedInitializer / speedForceRandomDampener),
+      maxForce(maxForceInitializer / speedForceRandomDampener),
+      randomForceFactor(randomFactorInitializer / speedForceRandomDampener),
+      dampingFactor(0.9f) {}
 
 float borderInvisiblePercentage = 0.85;                                 // between 0 and 1
 
@@ -45,6 +67,7 @@ void Boid::boidUpdatePosition() {
 
 void Boid::boidUpdateBoid() {
     boidConstrainToPhysicalBorders();
+    boidFleeFromPredator();
     //boidNudgeBoidAwayFromBorder();
     boidApplyRandomForce();
     boidUpdateVelocity();                                            // Chain update steps for animation frame by frame
@@ -104,7 +127,66 @@ void Boid::boidNudgeBoidAwayFromBorder() {
 }
 
 void Boid::boidFleeFromPredator() {
+    boidCalculateFearFactor();
+    boidScared = false;
 
+    if (fearFactor == 0) {
+        return;
+    }
+
+    if (fearFactor > 4.5) {
+        boidScared = true;
+    }
+
+    float closestDistance = std::numeric_limits<float>::max();
+    threepp::Vector3 closestPredatorPosition;
+
+    const std::vector<std::unique_ptr<Predator>>& predators = pack1.packGetPredators();
+    for (const auto& predator : predators) {
+        float distanceLength = (position - predator->predatorGetPosition()).length();
+        if (distanceLength < closestDistance) {
+            closestDistance = distanceLength;
+            closestPredatorPosition = predator->predatorGetPosition();
+        }
+    }
+
+    threepp::Vector3 fleeDirection = position - closestPredatorPosition;
+    if (fleeDirection.length() == 0) {
+
+        fleeDirection = threepp::Vector3(1.0f, 0.0f, 0.0f); // Arbitrary direction
+    }
+    fleeDirection.normalize();
+
+    threepp::Vector3 fleeForce = (fleeDirection * fearFactor)/speedForceRandomDampener;
+
+    boidApplyForce(fleeForce);
+}
+
+void Boid::boidCalculateFearFactor(){
+    if (pack1.packGetPredators().empty()) {
+        fearFactor = 0;
+        return;
+    }
+
+    float closestDistance = std::numeric_limits<float>::max();
+    float fearAmount = 0.0f;
+
+    const std::vector<std::unique_ptr<Predator>>& predators = pack1.packGetPredators();
+
+    for (const auto& predator : predators) {
+        float distanceLength = (position - predator->predatorGetPosition()).length();
+
+        if (distanceLength < closestDistance) {
+            closestDistance = distanceLength;
+        }
+    }
+
+    if (closestDistance < sightRange) {
+        float proximityFactor = 1.0f - (closestDistance / sightRange);
+        fearAmount = proximityFactor * 10.0f;
+    }
+
+    fearFactor = static_cast<int>(fearAmount);
 }
 
 const threepp::Vector3& Boid::boidGetPosition() const {                  // Access methods for use in main if needed
@@ -142,17 +224,13 @@ bool Boid::boidGetBoidOutOfBoundsCheck(Boid* boid) const {
     return false;
 }
 
-int Boid::boidCalculateFearFactor() const {
-    threepp::Vector3 Distance(0,0, 0);
-    int fearAmount = 0;
-    std::vector<std::unique_ptr<Predator>> predators = predator.predatorGetPredators;
-
-    for (auto& predator : predators)
-    Distance = position -
-
-    boidSetFearFactor(fearAmount)
-    return 0;
+bool Boid::boidGetBoidScaredCheck() const {
+    if (boidScared > 4.5) {
+        return true;
+    }
+    return false;
 }
+
 
 
 

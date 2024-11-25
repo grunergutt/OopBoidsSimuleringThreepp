@@ -79,7 +79,6 @@ void Arena::logBoidPositionsInGrid() const {
         }
     }
 }
-
 int borderSizes = 100;
 
-extern Arena arena(borderSizes, borderSizes, borderSizes, 5);
+Arena arena(borderSizes, borderSizes, borderSizes, 5);
