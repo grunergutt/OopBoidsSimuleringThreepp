@@ -6,7 +6,6 @@
 class Pack;
 
 class Boid {
-    int speedForceRandomDampener = 100;
 
 private:
     threepp::Vector3 position;                                       // Position of boid
@@ -24,14 +23,12 @@ private:
 
 public:
     Boid();
-    Boid(int identifier, int sightRangeInitializer = 200,
+    Boid(int identifier, int sightRangeInitializer = 25,
          bool outOfBoundsStatus = false,
          bool boidScaredStatus = false,
          float maxSpeedInitializer = 25,
          float maxForceInitializer = 5,
          float randomFactorInitializer = 0.5);
-
-
 
     void boidApplyRandomForce();                                     // Method declarations
     void boidApplyForce(const threepp::Vector3& force);              // this method will add forces calculated from flock class
@@ -39,7 +36,7 @@ public:
     void boidUpdatePosition();
     void boidUpdateBoid();
     void boidConstrainToPhysicalBorders();
-    void boidNudgeBoidAwayFromBorder();
+    void boidNudgeBoidAwayFromBorder(float nudgeForce);
     void boidFleeFromPredator();
     void boidCalculateFearFactor();
 

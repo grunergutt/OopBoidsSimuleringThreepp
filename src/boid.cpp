@@ -2,6 +2,10 @@
 #include "pack.hpp"
 #include "predator.hpp"
 #include "utilityfunctions.hpp"
+#include <iostream>
+
+float borderInvisiblePercentage = 0.85;                                 // between 0 and 1
+int speedForceRandomDampener = 100;
 
 Boid::Boid(int identifier, int sightRangeInitializer, bool outOfBoundsStatus,  bool boidScaredStatus,
            float maxSpeedInitializer, float maxForceInitializer,
@@ -22,7 +26,7 @@ Boid::Boid(int identifier, int sightRangeInitializer, bool outOfBoundsStatus,  b
       randomForceFactor(randomFactorInitializer / speedForceRandomDampener),
       dampingFactor(0.9f) {}
 
-float borderInvisiblePercentage = 0.85;                                 // between 0 and 1
+
 
 void Boid::boidApplyRandomForce() {
     threepp::Vector3 randomForce(                                    // Generate a random force with each component between -0.2 and 0.2
@@ -67,8 +71,6 @@ void Boid::boidUpdatePosition() {
 
 void Boid::boidUpdateBoid() {
     boidConstrainToPhysicalBorders();
-    boidFleeFromPredator();
-    //boidNudgeBoidAwayFromBorder();
     boidApplyRandomForce();
     boidUpdateVelocity();                                            // Chain update steps for animation frame by frame
     boidUpdatePosition();
@@ -93,38 +95,19 @@ void Boid::boidConstrainToPhysicalBorders() {
     }
 }
 
-void Boid::boidNudgeBoidAwayFromBorder() {
-    float width = arena.getArenaWidth() * borderInvisiblePercentage;
-    float height = arena.getArenaHeight() * borderInvisiblePercentage;
-    float depth = arena.getArenaDepth() * borderInvisiblePercentage;
+void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
 
-    threepp::Vector3 origo(0, 0, 0);
-    threepp::Vector3 repulsionForce(0, 0, 0);
+        threepp::Vector3 origin(0.0f, 0.0f, 0.0f);
+        threepp::Vector3 directionToOrigin = origin - position;
 
-    // X-Axis repulsion
-    if (position.x >= width / 2 ) {
-        repulsionForce.x = -1.0f * (width / 2 - position.x) / width; // Push left
-    } else if (position.x <= -width / 2 ) {
-        repulsionForce.x = 1.0f * (-width / 2 - position.x) / width; // Push right
-    }
+        if (directionToOrigin.length() > 0) {
+            directionToOrigin.normalize();
+            threepp::Vector3 nudgeForce = directionToOrigin * nudgeStrength;
 
-    // Y-Axis repulsion
-    if (position.y >= height / 2 ) {
-        repulsionForce.y = -1.0f * (height / 2 - position.y) / height; // Push down
-    } else if (position.y <= -height / 2 ) {
-        repulsionForce.y = 1.0f * (-height / 2 - position.y) / height; // Push up
-    }
-
-    // Z-Axis repulsion
-    if (position.z >= depth / 2) {
-        repulsionForce.z = -1.0f * (depth / 2 - position.z) / depth; // Push back
-    } else if (position.z <= -depth / 2) {
-        repulsionForce.z = 1.0f * (-depth / 2 - position.z) / depth; // Push forward
-    }
-
-    // Apply repulsion force to acceleration
-    acceleration += repulsionForce;
+            boidApplyForce(nudgeForce);
+        }
 }
+
 
 void Boid::boidFleeFromPredator() {
     boidCalculateFearFactor();
@@ -140,8 +123,10 @@ void Boid::boidFleeFromPredator() {
 
     float closestDistance = std::numeric_limits<float>::max();
     threepp::Vector3 closestPredatorPosition;
+    float scaredDampener = std::pow(0.5/speedForceRandomDampener, 10 - fearFactor);
 
     const std::vector<std::unique_ptr<Predator>>& predators = pack1.packGetPredators();
+
     for (const auto& predator : predators) {
         float distanceLength = (position - predator->predatorGetPosition()).length();
         if (distanceLength < closestDistance) {
@@ -157,7 +142,7 @@ void Boid::boidFleeFromPredator() {
     }
     fleeDirection.normalize();
 
-    threepp::Vector3 fleeForce = (fleeDirection * fearFactor)/speedForceRandomDampener;
+    threepp::Vector3 fleeForce = (fleeDirection * scaredDampener);
 
     boidApplyForce(fleeForce);
 }
@@ -165,6 +150,7 @@ void Boid::boidFleeFromPredator() {
 void Boid::boidCalculateFearFactor(){
     if (pack1.packGetPredators().empty()) {
         fearFactor = 0;
+        std::cout << "no predators seen" << std::endl;                                  //debug
         return;
     }
 
@@ -225,9 +211,13 @@ bool Boid::boidGetBoidOutOfBoundsCheck(Boid* boid) const {
 }
 
 bool Boid::boidGetBoidScaredCheck() const {
-    if (boidScared > 4.5) {
+
+    std::cout << fearFactor << std::endl;                     //debug
+
+    if (fearFactor > 4.5) {
         return true;
     }
+
     return false;
 }
 

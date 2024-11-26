@@ -11,7 +11,7 @@
 
 int main() {
 
-    int numberOfBoidsFlock1 = 200;
+    int numberOfBoidsFlock1 = 20;
     Flock flock1;
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
         flock1.flockAddBoid(std::make_unique<Boid>(i));
@@ -35,8 +35,7 @@ int main() {
         flock4.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfPredatorsPack1 = 5;
-    Pack pack1;
+    int numberOfPredatorsPack1 = 0;
     for (int i = 0; i < numberOfPredatorsPack1; i++) {
         pack1.packAddPredator(std::make_unique<Predator>(i));
     }

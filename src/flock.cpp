@@ -2,6 +2,9 @@
 #include "arena.hpp"
 #include "boid.hpp"
 
+extern int speedForceRandomDampener;
+
+
 threepp::Vector3 Flock::flockCalculateSeparation(const Boid& boid) {
     threepp::Vector3 separationForce(0.0f, 0.0f, 0.0f);
     int count = 0;
@@ -78,16 +81,19 @@ void Flock::flockApplyFlockingForces() {
         threepp::Vector3 cohesionForce = flockCalculateCohesion(*boid);
 
         if (boid->boidGetBoidScaredCheck()) {
-            // Scared boids
-            separationForce *= scaredDampener * 0.5f;
+
+            separationForce *= scaredDampener;
             alignmentForce *= scaredDampener;
             cohesionForce *= scaredDampener;
+            //boid->boidFleeFromPredator();
         }
 
-        if (boid->boidGetBoidOutOfBoundsCheck(boid.get())) {
+        if(boid->boidGetBoidOutOfBoundsCheck(boid.get())) {
 
             cohesionForce *= 1.5f;
-            alignmentForce *= 0.75f;
+            alignmentForce *= 0.25;
+            float nudgeForce = 5/speedForceRandomDampener;
+            boid->boidNudgeBoidAwayFromBorder(nudgeForce);
         }
 
         boid->boidApplyForce(separationForce * dampener);
