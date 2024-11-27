@@ -24,7 +24,7 @@ private:
 
 public:
     Flock()
-        : separationStrength(10),
+        : separationStrength(0.5),
           alignmentStrength(0.15),
           cohesionStrength(0.1),
           separationRadius(20),
@@ -38,6 +38,7 @@ public:
     const std::vector<std::unique_ptr<Boid>>& getBoids() const;
     const Boid& getBoidByIndex(int index) const;
     const int flockGetNumBoids();
+    bool flockGetBoidOutOfBoundsCheck(const std::unique_ptr<Boid>& boid) const;
 
     void setSeparationStrength(float strength) { separationStrength = strength; }
     void setAlignmentStrength(float strength) { alignmentStrength = strength; }

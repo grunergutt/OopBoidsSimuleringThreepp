@@ -73,7 +73,7 @@ void Flock::flockApplyFlockingForces() {
     }
 
     float dampener = 0.1f;
-    float scaredDampener = 0.05f;
+    float scaredDampener = 0.5f;
 
     for (auto& boid : boids) {
         threepp::Vector3 separationForce = flockCalculateSeparation(*boid);
@@ -85,16 +85,15 @@ void Flock::flockApplyFlockingForces() {
             separationForce *= scaredDampener;
             alignmentForce *= scaredDampener;
             cohesionForce *= scaredDampener;
-            //boid->boidFleeFromPredator();
         }
 
-        if(boid->boidGetBoidOutOfBoundsCheck(boid.get())) {
+        if(flockGetBoidOutOfBoundsCheck(boid) == true) {
 
-            cohesionForce *= 1.5f;
-            alignmentForce *= 0.25;
-            float nudgeForce = 5/speedForceRandomDampener;
-            boid->boidNudgeBoidAwayFromBorder(nudgeForce);
+            cohesionForce *= dampener;
+            separationForce *= dampener;
+            alignmentForce *= dampener;
         }
+
 
         boid->boidApplyForce(separationForce * dampener);
         boid->boidApplyForce(alignmentForce * dampener);
@@ -119,4 +118,22 @@ const Boid& Flock::getBoidByIndex(int index) const {
 
 const int Flock::flockGetNumBoids() {
     return static_cast<int>(boids.size());
+}
+
+bool Flock::flockGetBoidOutOfBoundsCheck(const std::unique_ptr<Boid>& boid) const {
+    extern float borderInvisiblePercentage;
+
+    float width = arena.getArenaWidth() * borderInvisiblePercentage;
+    float height = arena.getArenaHeight() * borderInvisiblePercentage;
+    float depth = arena.getArenaDepth() * borderInvisiblePercentage;
+
+    const threepp::Vector3& position = boid->boidGetPosition();
+
+    if (position.x > width / 2 || position.x < -width / 2 ||
+        position.y > height / 2 || position.y < -height / 2 ||
+        position.z > depth / 2 || position.z < -depth / 2) {
+        return true;
+        }
+
+    return false;
 }
