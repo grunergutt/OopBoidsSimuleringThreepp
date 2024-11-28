@@ -72,8 +72,8 @@ void Flock::flockApplyFlockingForces() {
         arena.addBoid(boid.get());
     }
 
-    float dampener = 0.1f;
-    float scaredDampener = 0.5f;
+    float dampener = 0.05f;
+    float scaredDampener = 0.05f;
 
     for (auto& boid : boids) {
         threepp::Vector3 separationForce = flockCalculateSeparation(*boid);

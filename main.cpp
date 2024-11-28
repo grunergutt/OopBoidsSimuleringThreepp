@@ -11,7 +11,7 @@
 
 int main() {
 
-    int numberOfBoidsFlock1 = 10;
+    int numberOfBoidsFlock1 = 200;
     Flock flock1;
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
         flock1.flockAddBoid(std::make_unique<Boid>(i));
@@ -35,7 +35,7 @@ int main() {
         flock4.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfPredatorsPack1 = 0;
+    int numberOfPredatorsPack1 = 5;
     for (int i = 0; i < numberOfPredatorsPack1; i++) {
         pack1.packAddPredator(std::make_unique<Predator>(i));
     }
@@ -84,8 +84,8 @@ int main() {
 
     auto flock1Group = createAnimationGroupForFlock(flock1, threepp::Color::yellow, boidCones1, 1);
     auto flock2Group = createAnimationGroupForFlock(flock2, threepp::Color::cyan, boidCones2, 1);
-    auto flock3Group = createAnimationGroupForFlock(flock3, threepp::Color::purple, boidCones3, 1);
-    auto flock4Group = createAnimationGroupForFlock(flock4, threepp::Color::orange, boidCones4, 1);
+    auto flock3Group = createAnimationGroupForFlock(flock3, threepp::Color::darkblue, boidCones3, 1);
+    auto flock4Group = createAnimationGroupForFlock(flock4, threepp::Color::brown, boidCones4, 1);
     auto predatorsGroup = createAnimationGroupForPack(pack1, threepp::Color::red, predators, 4);
 
     scene->add(flock1Group);
@@ -100,6 +100,7 @@ int main() {
         flock2.flockUpdateFlock();
         flock3.flockUpdateFlock();
         flock4.flockUpdateFlock();
+        pack1.packUpdatePack();
 
         for (int i = 0; i < flock1.flockGetNumBoids(); i++) {
             const Boid& boid = flock1.getBoidByIndex(i);
@@ -135,6 +136,16 @@ int main() {
 
             boidCones4[i]->position.copy(boidPosition);
             rotateConeTowardsVelocity(boidCones4[i], boidVelocity);
+        }
+
+        for (int i = 0; i < pack1.packGetNumPredators(); i++) {
+            const Predator& predator = pack1.packGetPredatorByIndex(i);
+            threepp::Vector3 predatorPosition = predator.predatorGetPosition();
+            threepp::Vector3 predatorVelocity = predator.predatorGetVelocity();
+
+            predators[i]->position.copy(predatorPosition);
+            rotateConeTowardsVelocity(predators[i], predatorVelocity);
+
         }
 
         renderer.clear();

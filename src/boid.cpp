@@ -4,7 +4,7 @@
 #include "utilityfunctions.hpp"
 #include <iostream>
 
-float borderInvisiblePercentage = 0.8;                                 // between 0 and 1
+float borderInvisiblePercentage = 0.7;                                 // between 0 and 1
 int speedForceRandomDampener = 100;
 
 Boid::Boid(int identifier, int sightRangeInitializer, bool outOfBoundsStatus,  bool boidScaredStatus,
@@ -40,7 +40,7 @@ void Boid::boidApplyRandomForce() {
         acceleration.normalize();
         acceleration.multiplyScalar(maxForce);
     }
-
+    //std::cout << "Random: " << randomForce << " Acc: " << acceleration << std::endl;      //debug
 }
 
 void Boid::boidApplyForce(const threepp::Vector3& flockForce) {     // Function adds flocking forces calculated in flock class
@@ -71,8 +71,9 @@ void Boid::boidUpdatePosition() {
 
 void Boid::boidUpdateBoid() {
     boidCalculateFearFactor();
+
     if (boidGetBoidOutOfBoundsCheck()) {
-        float nudgeForce = 0.1/speedForceRandomDampener;
+        float nudgeForce = maxForce/10;
         boidNudgeBoidAwayFromBorder(nudgeForce);
     }
 
@@ -80,11 +81,11 @@ void Boid::boidUpdateBoid() {
         boidApplyRandomForce();
     }
 
-    if (boidScared) {
-        boidFleeFromPredator();
-    }
+    boidFleeFromPredator();
+
     boidUpdateVelocity();                                            // Chain update steps for animation frame by frame
     boidUpdatePosition();
+    //std::cout << "Boid maxSpeed: " << maxSpeed << "\n" << "Boid maxForce: " << maxForce << std::endl;             //debug
 }
 
 void Boid::boidConstrainToPhysicalBorders() {
@@ -107,8 +108,6 @@ void Boid::boidConstrainToPhysicalBorders() {
 }
 
 void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
-    threepp::Vector3 origin(0.0f, 0.0f, 0.0f);
-    threepp::Vector3 directionToOrigin = origin - position;
 
     float arenaWidth = arena.getArenaWidth() / 2;
     float arenaHeight = arena.getArenaHeight() / 2;
@@ -117,7 +116,9 @@ void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
     float invisibleHeight = arenaHeight * borderInvisiblePercentage;
     float invisibleDepth = arenaDepth * borderInvisiblePercentage;
 
-    // Determine scaling factors for each axis
+    threepp::Vector3 nudgePoint(getRandomFloat(-invisibleWidth, invisibleWidth), getRandomFloat(-invisibleHeight, invisibleHeight), getRandomFloat(-invisibleDepth, invisibleDepth));
+    threepp::Vector3 directionToOrigin = nudgePoint - position;
+
     float scaleX = 0.0f, scaleY = 0.0f, scaleZ = 0.0f;
 
     if (std::abs(position.x) > invisibleWidth) {
@@ -155,20 +156,14 @@ void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
 
 
 void Boid::boidFleeFromPredator() {
-    boidCalculateFearFactor();
-    boidScared = false;
-
-    if (fearFactor == 0) {
+    //std::cout << boidScared << std::endl;                                                 //debug
+    if (!boidScared) {
         return;
-    }
-
-    if (fearFactor > 3.5) {
-        boidScared = true;
     }
 
     float closestDistance = std::numeric_limits<float>::max();
     threepp::Vector3 closestPredatorPosition;
-    float scaredDampener = std::pow(0.5/speedForceRandomDampener, 10 - fearFactor);
+    float scaredDampener = std::pow(2.0f, fearFactor - 7) / speedForceRandomDampener;
 
     const std::vector<std::unique_ptr<Predator>>& predators = pack1.packGetPredators();
 
@@ -183,16 +178,21 @@ void Boid::boidFleeFromPredator() {
     threepp::Vector3 fleeDirection = position - closestPredatorPosition;
     if (fleeDirection.length() == 0) {
 
-        fleeDirection = threepp::Vector3(1.0f, 0.0f, 0.0f); // Arbitrary direction
+        fleeDirection = threepp::Vector3(1.0f, 0.0f, 0.0f);
     }
     fleeDirection.normalize();
 
     threepp::Vector3 fleeForce = (fleeDirection * scaredDampener);
 
+    //std::cout << fleeForce << std::endl;                                                  //debug
+    //std::cout << fearFactor << std::endl;                                                 //debug
+
     boidApplyForce(fleeForce);
 }
 
 void Boid::boidCalculateFearFactor(){
+    boidScared = false;
+
     if (pack1.packGetPredators().empty()) {
         fearFactor = 0;
         //std::cout << "no predators seen" << std::endl;                                  //debug
@@ -218,6 +218,7 @@ void Boid::boidCalculateFearFactor(){
     }
 
     fearFactor = static_cast<int>(fearAmount);
+    boidScared = (fearFactor > 3.5);
 }
 
 const threepp::Vector3& Boid::boidGetPosition() const {                  // Access methods for use in main if needed
@@ -249,24 +250,20 @@ bool Boid::boidGetBoidOutOfBoundsCheck() const {
     if (position.x > width / 2 || position.x < -width / 2 ||
         position.y > height / 2 || position.y < -height / 2 ||
         position.z > depth / 2 || position.z < -depth / 2) {
-        std::cout << "out of bounds" << std::endl;                              //debug
+        //std::cout << "out of bounds" << std::endl;                              //debug
         return true;
         }
 
-    std::cout << "not out of bounds" << std::endl;                              //debug
+    //std::cout << "not out of bounds" << std::endl;                              //debug
     return false;
 }
 
 
 bool Boid::boidGetBoidScaredCheck() const {
 
-    //std::cout << fearFactor << std::endl;                     //debug
+    //std::cout << fearFactor << std::endl;                                       //debug
 
-    if (fearFactor > 3.5) {
-        return true;
-    }
-
-    return false;
+    return boidScared;
 }
 
 

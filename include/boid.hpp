@@ -24,12 +24,12 @@ private:
 public:
 
     Boid();
-    Boid(int identifier, int sightRangeInitializer = 25,
+    Boid(int identifier, int sightRangeInitializer = 35,
          bool outOfBoundsStatus = false,
          bool boidScaredStatus = false,
-         float maxSpeedInitializer = 10,
-         float maxForceInitializer = 3,
-         float randomFactorInitializer = 0.3);
+         float maxSpeedInitializer = 20,
+         float maxForceInitializer = 4,
+         float randomFactorInitializer = 0.4);
 
     void boidApplyRandomForce();                                     // Method declarations
     void boidApplyForce(const threepp::Vector3& force);              // this method will add forces calculated from flock class

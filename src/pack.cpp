@@ -20,4 +20,13 @@ const Predator& Pack::packGetPredatorByIndex(int index) const {
     return *predators[index];
 }
 
+void Pack::packUpdatePack() {
+    for (auto& predator : predators) {
+        predator->predatorUpdatePredator();
+    }
+}
+
+
+
+
 Pack pack1;
