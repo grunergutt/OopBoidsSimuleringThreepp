@@ -1,30 +1,30 @@
 #ifndef PREDATOR_HPP
 #define PREDATOR_HPP
 
-#include <threepp/threepp.hpp>
+#include "threepp/threepp.hpp"
 #include "arena.hpp"
-#include "utilityfunctions.hpp"
-#include <memory>
 
 class Boid;
+class Flock;
 
 class Predator {
     private:
     std::vector<std::unique_ptr<Predator>> predators;
 
-        threepp::Vector3 position;
-        threepp::Vector3 velocity;
-        threepp::Vector3 acceleration;
-        int identifier;
-        int aggression;
-        bool attacking;
-        int sightAngle;
-        int sightDistance;
-        bool predatorOutOfBounds;
-        float maxSpeed;                                                  // Maximum speed, will create slider for this
-        float maxForce;                                                  // Maximum force applicable to acceleration, will create slider here too
-        float randomForceFactor;
-        float dampingFactor;
+    threepp::Vector3 position;
+    threepp::Vector3 velocity;
+    threepp::Vector3 acceleration;
+    int identifier;
+    int aggression;
+    bool attacking;
+    int sightAngle;
+    int sightRange;
+    bool predatorOutOfBounds;
+    float maxSpeed;                                                  // Maximum speed, will create slider for this
+    float maxForce;                                                  // Maximum force applicable to acceleration, will create slider here too
+    float randomForceFactor;
+    float dampingFactor;
+    int cooldownFrames;
 
     public:
 
@@ -33,22 +33,20 @@ class Predator {
         int fieldOfView = 180,
         bool outOfBoundsStatus = false,
         bool attackingStatus = false,
-        float maxSpeedInitializer = 15.0f,
-        float maxForceInitializer = 5.0f,
+        float maxSpeedInitializer = 50.0f,
+        float maxForceInitializer = 10.0f,
         float randomFactorInitializer = 0.5f);
 
-    void predatorSpawnPredator();
-    void predatorKillPredator();
-
-    void predatorCalculateAttackPoint();
-    void predatorAttack();
+    threepp::Vector3 predatorCalculateAttackPoint(const std::vector<Flock*>& flocks);
+    void predatorAttackPoint(const threepp::Vector3& target);
 
     void predatorApplyRandomForce();                                     // Method declarations
     void predatorApplyForce(const threepp::Vector3& force);              // this method will add forces calculated from flock class
     void predatorUpdateVelocity();
     void predatorUpdatePosition();
-    void predatorUpdatePredator();
+    void predatorUpdatePredator(const std::vector<Flock*>& flocks);
     void predatorNudgePredatorAwayFromBorder(float nudgeForce);
+    void predatorNudgeAwayFromPredators(float nudgeForce);
 
 
     const threepp::Vector3& predatorGetPosition() const;
@@ -58,7 +56,7 @@ class Predator {
 
     const int predatorCalculateSightAngle() const;
 
-    void setPredatorSightDistance(int distance){sightDistance = distance;};
+    void setPredatorSightDistance(int distance){sightRange = distance;};
     void setPredatorAgression(int agressionLevel){aggression = agressionLevel;};
 
 

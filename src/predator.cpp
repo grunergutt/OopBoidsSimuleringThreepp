@@ -1,7 +1,19 @@
-#include  "predator.hpp"
+
+
+
+#include "predator.hpp"
+#include "utilityfunctions.hpp"
+#include "boid.hpp"
+#include <cmath>
+#include "flock.hpp"
 #include <iostream>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 extern int speedForceRandomDampener;
+extern float borderInvisiblePercentage;
 
 Predator::Predator(int predatorIdentifier,
                    int fieldOfView,
@@ -19,17 +31,98 @@ Predator::Predator(int predatorIdentifier,
     identifier(predatorIdentifier),
     aggression(0),
     sightAngle(fieldOfView),
-    sightDistance(arena.getArenaDepth() / 3),
+    sightRange(arena.getArenaDepth() / 2),
     attacking(attackingStatus),
     predatorOutOfBounds(outOfBoundsStatus),
     maxSpeed(maxSpeedInitializer / static_cast<float>(speedForceRandomDampener)),
     maxForce(maxForceInitializer / static_cast<float>(speedForceRandomDampener)),
     randomForceFactor(randomFactorInitializer / static_cast<float>(speedForceRandomDampener)),
-    dampingFactor(0.9f) {}
+    dampingFactor(0.99f),
+    cooldownFrames(0){}
 
 
-void predatorCalculateAttackPoint();
-void predatorAttack();
+threepp::Vector3 Predator::predatorCalculateAttackPoint(const std::vector<Flock*>& flocks) {
+
+    if (cooldownFrames > 0) {
+        return threepp::Vector3(0,0,0);
+    }
+    threepp::Vector3 centerOfMass(0, 0, 0);
+    int boidsInSight = 0;
+
+    for (const auto& flock : flocks) {
+        for (const auto& boid : flock->getBoids()) {
+
+            threepp::Vector3 toBoid = boid->boidGetPosition() - position;
+            float distance = toBoid.length();
+
+            if (distance > sightRange) {
+                continue;
+            }
+
+            // Check if boid is within the field of view
+            toBoid.normalize();
+            threepp::Vector3 forward = velocity.normalize(); // Predator's direction
+            float angle = std::acos(forward.dot(toBoid)) * (180.0f / M_PI); // Convert to degrees
+
+            if (angle > sightAngle / 2.0f) {
+                continue; // Boid is outside field of view
+            }
+
+            // Add boid's position to center of mass calculation
+            centerOfMass.add(boid->boidGetPosition());
+            boidsInSight++;
+        }
+    }
+
+    // Only calculate center of mass if more than 20 boids are in sight
+    if (boidsInSight >= 20) {
+        // Calculate the center of mass of the boids in sight
+        centerOfMass.multiplyScalar(1.0f / boidsInSight);
+        //std::cout << centerOfMass << std::endl;                                                             //debug
+        return centerOfMass; // Return the center of mass to be used by the attack logic
+    }
+
+    // Return a default vector (e.g., zero vector) if no valid target
+    return threepp::Vector3(0, 0, 0);
+}
+
+
+void Predator::predatorAttackPoint(const threepp::Vector3& target) {
+
+
+    if (target.length() == 0) {
+        return;  // No valid target to attack
+    }
+
+    float originalMaxSpeed = maxSpeed;
+    float originalMaxForce = maxForce;
+
+    maxSpeed *= 3;
+    maxForce *= 3;
+
+    threepp::Vector3 direction = target - position;
+    direction.normalize();
+
+    threepp::Vector3 desiredVelocity = direction * maxSpeed;
+
+    threepp::Vector3 steering = desiredVelocity - velocity;
+
+    steering *= 3;
+
+    if (steering.length() > maxForce) {
+        steering.normalize();
+        steering.multiplyScalar(maxForce);
+    }
+
+    if(predatorOutOfBounds) {
+        steering *= 0.5;
+    }
+
+    acceleration.add(steering);
+
+    maxSpeed = originalMaxSpeed;
+    maxForce = originalMaxForce;
+}
 
 void Predator::predatorApplyRandomForce(){
 
@@ -73,8 +166,7 @@ void Predator::predatorUpdatePosition() {
 
 }
 
-void Predator::predatorUpdatePredator() {
-
+void Predator::predatorUpdatePredator(const std::vector<Flock*>& flocks) {
     if (predatorGetOutOfBoundsCheck()) {
         float nudgeForce = maxForce / 10.0f;
         predatorNudgePredatorAwayFromBorder(nudgeForce);
@@ -84,9 +176,12 @@ void Predator::predatorUpdatePredator() {
         predatorApplyRandomForce();
     }
 
-    predatorUpdateVelocity();                                            // Chain update steps for animation frame by frame
+
+    predatorAttackPoint(predatorCalculateAttackPoint(flocks));
+
+
+    predatorUpdateVelocity();
     predatorUpdatePosition();
-    //std::cout  << ", Predator maxSpeed: " << maxSpeed << "\n" <<  ", Predator maxForce: " << maxForce << std::endl;           //debug
 }
 
 void Predator::predatorNudgePredatorAwayFromBorder(float nudgeStrength) {
@@ -99,24 +194,24 @@ void Predator::predatorNudgePredatorAwayFromBorder(float nudgeStrength) {
     float invisibleHeight = arenaHeight * borderInvisiblePercentage;
     float invisibleDepth = arenaDepth * borderInvisiblePercentage;
 
-    threepp::Vector3 nudgePoint(getRandomFloat(-invisibleWidth, invisibleWidth), getRandomFloat(-invisibleHeight, invisibleHeight), getRandomFloat(-invisibleDepth, invisibleDepth));
+    threepp::Vector3 nudgePoint(0, 0, 0);
     threepp::Vector3 directionToOrigin = nudgePoint - position;
 
     float scaleX = 0.0f, scaleY = 0.0f, scaleZ = 0.0f;
 
     if (std::abs(position.x) > invisibleWidth) {
         float scaleFactor = (std::abs(position.x) - invisibleWidth) / (arenaWidth - invisibleWidth);
-        scaleX = std::pow(scaleFactor, 2.0f); // Quadratic scaling for stronger growth near hard border
+        scaleX = std::pow(scaleFactor, 5.0f); // Quadratic scaling for stronger growth near hard border
     }
 
     if (std::abs(position.y) > invisibleHeight) {
         float scaleFactor = (std::abs(position.y) - invisibleHeight) / (arenaHeight - invisibleHeight);
-        scaleY = std::pow(scaleFactor, 2.0f); // Quadratic scaling for stronger growth near hard border
+        scaleY = std::pow(scaleFactor, 5.0f); // Quadratic scaling for stronger growth near hard border
     }
 
     if (std::abs(position.z) > invisibleDepth) {
         float scaleFactor = (std::abs(position.z) - invisibleDepth) / (arenaDepth - invisibleDepth);
-        scaleZ = std::pow(scaleFactor, 2.0f); // Quadratic scaling for stronger growth near hard border
+        scaleZ = std::pow(scaleFactor, 5.0f); // Quadratic scaling for stronger growth near hard border
     }
 
     // Calculate nudge force if outside invisible border
@@ -135,6 +230,10 @@ void Predator::predatorNudgePredatorAwayFromBorder(float nudgeStrength) {
         // Apply only the nudge force
         predatorApplyForce(nudgeForce);
     }
+}
+
+void Predator::predatorNudgeAwayFromPredators(float nudgeForce) {
+
 }
 
 const threepp::Vector3& Predator::predatorGetPosition() const{
@@ -174,3 +273,4 @@ const bool Predator::predatorGetOutOfBoundsCheck() const {
 const int Predator::predatorCalculateSightAngle() const {
     return 0;
 }
+
