@@ -1,5 +1,9 @@
 #include "flock.hpp"
 #include "arena.hpp"
+#include "boid.hpp"
+
+extern int speedForceRandomDampener;
+
 
 threepp::Vector3 Flock::flockCalculateSeparation(const Boid& boid) {
     threepp::Vector3 separationForce(0.0f, 0.0f, 0.0f);
@@ -68,21 +72,32 @@ void Flock::flockApplyFlockingForces() {
         arena.addBoid(boid.get());
     }
 
-    // arena.logBoidPositionsInGrid();                                          //debug logging
-    float dampener = 0.1;
+    float dampener = 0.05f;
+    float scaredDampener = 0.05f;
 
     for (auto& boid : boids) {
-        if (!boid->boidGetBoidOutOfBoundsCheck(boid.get())) {
-            threepp::Vector3 separationForce = flockCalculateSeparation(*boid);
-            threepp::Vector3 alignmentForce = flockCalculateAlignment(*boid);
-            threepp::Vector3 cohesionForce = flockCalculateCohesion(*boid);
-            boid->boidApplyForce(separationForce*dampener);
-            boid->boidApplyForce(alignmentForce*dampener);
-            boid->boidApplyForce(cohesionForce*dampener);
+        threepp::Vector3 separationForce = flockCalculateSeparation(*boid);
+        threepp::Vector3 alignmentForce = flockCalculateAlignment(*boid);
+        threepp::Vector3 cohesionForce = flockCalculateCohesion(*boid);
+
+        if (boid->boidGetBoidScaredCheck()) {
+
+            separationForce *= scaredDampener;
+            alignmentForce *= scaredDampener;
+            cohesionForce *= scaredDampener;
         }
-        else if(boid->boidGetBoidOutOfBoundsCheck(boid.get())){
-            boid->boidNudgeBoidAwayFromBorder();
+
+        if(flockGetBoidOutOfBoundsCheck(boid) == true) {
+
+            cohesionForce *= dampener;
+            separationForce *= dampener;
+            alignmentForce *= dampener;
         }
+
+
+        boid->boidApplyForce(separationForce * dampener);
+        boid->boidApplyForce(alignmentForce * dampener);
+        boid->boidApplyForce(cohesionForce * dampener);
     }
 }
 
@@ -103,4 +118,22 @@ const Boid& Flock::getBoidByIndex(int index) const {
 
 const int Flock::flockGetNumBoids() {
     return static_cast<int>(boids.size());
+}
+
+bool Flock::flockGetBoidOutOfBoundsCheck(const std::unique_ptr<Boid>& boid) const {
+    extern float borderInvisiblePercentage;
+
+    float width = arena.getArenaWidth() * borderInvisiblePercentage;
+    float height = arena.getArenaHeight() * borderInvisiblePercentage;
+    float depth = arena.getArenaDepth() * borderInvisiblePercentage;
+
+    const threepp::Vector3& position = boid->boidGetPosition();
+
+    if (position.x > width / 2 || position.x < -width / 2 ||
+        position.y > height / 2 || position.y < -height / 2 ||
+        position.z > depth / 2 || position.z < -depth / 2) {
+        return true;
+        }
+
+    return false;
 }

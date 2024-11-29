@@ -1,9 +1,20 @@
 #include "arena.hpp"
 #include "boid.hpp"
+#include "predator.hpp"
 #include <iostream>
 
 void Arena::clearGrid() {
-    for (auto& plane : grid) {
+    for (auto& plane : boidGrid) {
+        for (auto& row : plane) {
+            for (auto& cell : row) {
+                cell.clear();
+            }
+        }
+    }
+}
+
+void Arena::clearPredatorGrid() {
+    for (auto& plane : predatorGrid) {
         for (auto& row : plane) {
             for (auto& cell : row) {
                 cell.clear();
@@ -21,7 +32,7 @@ std::tuple<int, int, int> Arena::getCellIndices(const threepp::Vector3& position
 
 void Arena::addBoid(const Boid* boid) {
     auto [x, y, z] = getCellIndices(boid->boidGetPosition());
-    grid[x][y][z].push_back(boid);
+    boidGrid[x][y][z].push_back(boid);
 }
 
 std::vector<const Boid*> Arena::getNeighboringBoids(const Boid& boid, int range) const {
@@ -36,8 +47,37 @@ std::vector<const Boid*> Arena::getNeighboringBoids(const Boid& boid, int range)
     for (int i = xMin; i <= xMax; ++i) {
         for (int j = yMin; j <= yMax; ++j) {
             for (int k = zMin; k <= zMax; ++k) {
-                for (const Boid* neighbor : grid[i][j][k]) {
+                for (const Boid* neighbor : boidGrid[i][j][k]) {
                     if (neighbor != &boid) {
+                        neighbors.push_back(neighbor);
+                    }
+                }
+            }
+        }
+    }
+    return neighbors;
+}
+
+void Arena::addPredator(const Predator* predator) {
+    auto [x, y, z] = getCellIndices(predator->predatorGetPosition());
+    predatorGrid[x][y][z].push_back(predator);
+}
+
+std::vector<const Predator*> Arena::getNeighboringPredators(const Predator& predator, int range) const {
+    std::vector<const Predator*> neighbors;
+    auto [x, y, z] = getCellIndices(predator.predatorGetPosition());
+    int xMin = std::max(0, x - range);
+    int xMax = std::min(xCells - 1, x + range);
+    int yMin = std::max(0, y - range);
+    int yMax = std::min(yCells - 1, y + range);
+    int zMin = std::max(0, z - range);
+    int zMax = std::min(zCells - 1, z + range);
+
+    for (int i = xMin; i <= xMax; ++i) {
+        for (int j = yMin; j <= yMax; ++j) {
+            for (int k = zMin; k <= zMax; ++k) {
+                for (const Predator* neighbor : predatorGrid[i][j][k]) {
+                    if (neighbor != &predator) {
                         neighbors.push_back(neighbor);
                     }
                 }
@@ -67,9 +107,9 @@ void Arena::logBoidPositionsInGrid() const {
     for (int x = 0; x < xCells; ++x) {
         for (int y = 0; y < yCells; ++y) {
             for (int z = 0; z < zCells; ++z) {
-                if (!grid[x][y][z].empty()) {
+                if (!boidGrid[x][y][z].empty()) {
                     std::cout << "Cell (" << x << ", " << y << ", " << z << ") contains:\n";
-                    for (const Boid* boid : grid[x][y][z]) {
+                    for (const Boid* boid : boidGrid[x][y][z]) {
                         const auto& position = boid->boidGetPosition();
                         std::cout << "  Boid ID " << boid->boidGetBoidIdentifier() << " at ("
                                   << position.x << ", " << position.y << ", " << position.z << ")\n";
@@ -80,5 +120,8 @@ void Arena::logBoidPositionsInGrid() const {
     }
 }
 
-int borderSizes = 50;
+
+int borderSizes = 100;
+
 Arena arena(borderSizes, borderSizes, borderSizes, 5);
+

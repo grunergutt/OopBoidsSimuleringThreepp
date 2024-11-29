@@ -1,5 +1,9 @@
 #include "threeppfunctions.hpp"
 #include "arena.hpp"
+#include "flock.hpp"
+#include "boid.hpp"
+#include "predator.hpp"
+#include "pack.hpp"
 #include <iostream>
 
 std::shared_ptr<threepp::Mesh> createLineMesh(const threepp::Vector3 &pos, float width, float height, float depth) {
@@ -101,9 +105,9 @@ std::unique_ptr<threepp::HUD> create2dHUD(
     return hud;
 }
 
-std::shared_ptr<threepp::Mesh> createConeMeshForBoid(const threepp::Vector3 &pos, const threepp::Color &color) {
-    float radius = 0.5f;
-    float height = 1.5f;
+std::shared_ptr<threepp::Mesh> createConeMeshForObject(const threepp::Vector3 &pos, const threepp::Color &color, int size) {
+    float radius = 0.5f * size;
+    float height = 1.5f * size;
     int radialSegments = 16;
 
     auto geometry = threepp::ConeGeometry::create(radius, height, radialSegments);
@@ -118,16 +122,18 @@ std::shared_ptr<threepp::Mesh> createConeMeshForBoid(const threepp::Vector3 &pos
 
     coneMesh->rotation.x = -3.14159f / 2;
 
-    std::cout << "Creating cone mesh at position: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;
+    //std::cout << "Creating cone mesh at position: " << pos.x << ", " << pos.y << ", " << pos.z << std::endl;          //Debuging boid spawning
 
     return coneMesh;
 
 }
 
-std::shared_ptr<threepp::Group> createAnimationGroup(
+std::shared_ptr<threepp::Group> createAnimationGroupForFlock(
     Flock& flock,
     const threepp::Color& color,
-    std::vector<std::shared_ptr<threepp::Mesh>>& boidCones) {
+    std::vector<std::shared_ptr<threepp::Mesh>>& boidCones,
+    int size)
+{
 
     auto group = threepp::Group::create();
 
@@ -135,10 +141,32 @@ std::shared_ptr<threepp::Group> createAnimationGroup(
         const Boid& boid = flock.getBoidByIndex(i);
         threepp::Vector3 boidPosition = boid.boidGetPosition();
 
-        auto boidCone = createConeMeshForBoid(boidPosition, color);
+        auto boidCone = createConeMeshForObject(boidPosition, color, size);
 
         group->add(boidCone);
         boidCones.push_back(boidCone);
+    }
+
+    return group;
+}
+
+std::shared_ptr<threepp::Group> createAnimationGroupForPack(
+    Pack& pack,
+    const threepp::Color& color,
+    std::vector<std::shared_ptr<threepp::Mesh>>& predatorCones,
+    int size)
+{
+
+    auto group = threepp::Group::create();
+
+    for (int i = 0; i < pack.packGetNumPredators(); i++) {
+        const Predator& predator = pack.packGetPredatorByIndex(i);
+        threepp::Vector3 predatorPosition = predator.predatorGetPosition();
+
+        auto boidCone = createConeMeshForObject(predatorPosition, color, size);
+
+        group->add(boidCone);
+        predatorCones.push_back(boidCone);
     }
 
     return group;
@@ -159,4 +187,3 @@ void rotateConeTowardsVelocity(std::shared_ptr<threepp::Mesh> boidCone, const th
         boidCone->quaternion.copy(rotation);
     }
 }
-

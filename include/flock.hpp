@@ -1,9 +1,11 @@
 #ifndef FLOCK_HPP
 #define FLOCK_HPP
 
-#include "boid.hpp"
+#include "threepp/threepp.hpp"
 #include <vector>
 #include <memory>
+
+class Boid;
 
 class Flock {
 private:
@@ -24,10 +26,10 @@ public:
     Flock()
         : separationStrength(10),
           alignmentStrength(0.15),
-          cohesionStrength(0.05),
-          separationRadius(20),
-          alignmentRadius(20),
-          cohesionRadius(20) {}
+          cohesionStrength(0.1),
+          separationRadius(10),
+          alignmentRadius(15),
+          cohesionRadius(15) {}
 
     void flockAddBoid(std::unique_ptr<Boid> boid);
     void flockApplyFlockingForces();
@@ -36,6 +38,7 @@ public:
     const std::vector<std::unique_ptr<Boid>>& getBoids() const;
     const Boid& getBoidByIndex(int index) const;
     const int flockGetNumBoids();
+    bool flockGetBoidOutOfBoundsCheck(const std::unique_ptr<Boid>& boid) const;
 
     void setSeparationStrength(float strength) { separationStrength = strength; }
     void setAlignmentStrength(float strength) { alignmentStrength = strength; }
