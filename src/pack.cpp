@@ -37,7 +37,7 @@ threepp::Vector3 Pack::packCalculateSeparation(const Predator& predator) {
     }
     if (count > 0) separationForce /= static_cast<float>(count);
     separationForce *= separationStrength;
-    std::cout << separationForce << std::endl;
+
     return separationForce;
 }
 
