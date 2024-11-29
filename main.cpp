@@ -1,13 +1,15 @@
-#include "threepp/threepp.hpp"
-#include "arena.hpp"
-#include "boid.hpp"
-#include "flock.hpp"
-#include "threeppfunctions.hpp"
-#include "predator.hpp"
-#include "pack.hpp"
-#include <imgui.h>
+#include "threepp/threepp.hpp"      // Threepp core
+#include "arena.hpp"                // Your custom class
+#include "boid.hpp"                 // Your custom class
+#include "flock.hpp"                // Your custom class
+#include "threeppfunctions.hpp"     // Your custom functions
+#include "predator.hpp"             // Your custom class
+#include "pack.hpp"                 // Your custom class
+#include <imgui.h>                  // ImGui core
+#include <imgui_impl_glfw.h>        // ImGui GLFW backend
+#include <imgui_impl_opengl3.h>     // ImGui OpenGL3 backend
 #include <iostream>
-#include <GLFW/glfw3.h>
+#include <GLFW/glfw3.h>             // GLFW library
 
 
 int main() {
@@ -90,8 +92,26 @@ int main() {
     scene->add(flock3Group);
     scene->add(predatorsGroup);
 
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)canvas.windowPtr(), true); // Correctly retrieve window handle
+    ImGui_ImplOpenGL3_Init("#version 150");
+
+    // Slider for user input
+    float slider_value = 2.0f;
+
     threepp::Clock clock;
     canvas.animate([&] {
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // Add ImGui slider
+        ImGui::Begin("Slider Control");
+        ImGui::SliderFloat("Value", &slider_value, 0.0f, 4.0f);
+        ImGui::End();
+
         flock1.flockUpdateFlock();
         flock2.flockUpdateFlock();
         flock3.flockUpdateFlock();
@@ -138,7 +158,13 @@ int main() {
         renderer.clear();
         renderer.render(*scene, *camera);
         hud->apply(renderer);
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     });
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     return 0;
 }
