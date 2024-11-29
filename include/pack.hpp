@@ -19,7 +19,8 @@ class Pack {
     const std::vector<std::unique_ptr<Predator>>& packGetPredators() const;
     const int packGetNumPredators();
     const Predator& packGetPredatorByIndex(int index) const;
-    void packUpdatePack();
+    void packUpdatePack(const std::vector<Flock*>& flocks);
+
 
 };
 

@@ -1,5 +1,6 @@
 #include "pack.hpp"
 #include <threepp/threepp.hpp>
+#include <iostream>
 
 void Pack::packAddPredator(std::unique_ptr<Predator> predator){
     predators.push_back(std::move(predator));
@@ -20,9 +21,10 @@ const Predator& Pack::packGetPredatorByIndex(int index) const {
     return *predators[index];
 }
 
-void Pack::packUpdatePack() {
+void Pack::packUpdatePack(const std::vector<Flock*>& flocks) {
+
     for (auto& predator : predators) {
-        predator->predatorUpdatePredator();
+        predator->predatorUpdatePredator(flocks);
     }
 }
 

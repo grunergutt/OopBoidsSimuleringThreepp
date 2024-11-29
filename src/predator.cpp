@@ -42,87 +42,72 @@ Predator::Predator(int predatorIdentifier,
 
 
 threepp::Vector3 Predator::predatorCalculateAttackPoint(const std::vector<Flock*>& flocks) {
-
     if (cooldownFrames > 0) {
-        return threepp::Vector3(0,0,0);
+        return threepp::Vector3(0, 0, 0);
     }
+
     threepp::Vector3 centerOfMass(0, 0, 0);
     int boidsInSight = 0;
 
     for (const auto& flock : flocks) {
         for (const auto& boid : flock->getBoids()) {
-
             threepp::Vector3 toBoid = boid->boidGetPosition() - position;
             float distance = toBoid.length();
 
-            if (distance > sightRange) {
+            if (distance > sightRange || sightRange <= 0) {
+                continue; // Skip if out of range
+            }
+
+            if (toBoid.length() == 0) {
+                toBoid.set(1.0f, 0.0f, 0.0f); // Default direction for zero-length vector
+            }
+            toBoid.normalize();
+
+            threepp::Vector3 forward = velocity.length() > 0 ? velocity.normalize() : threepp::Vector3(1.0f, 0.0f, 0.0f);
+            float dotProduct = forward.dot(toBoid);
+            dotProduct = std::clamp(dotProduct, -1.0f, 1.0f);
+
+            float angle = std::acos(dotProduct) * (180.0f / M_PI);
+            if (angle > sightAngle / 2.0f) {
                 continue;
             }
 
-            // Check if boid is within the field of view
-            toBoid.normalize();
-            threepp::Vector3 forward = velocity.normalize(); // Predator's direction
-            float angle = std::acos(forward.dot(toBoid)) * (180.0f / M_PI); // Convert to degrees
-
-            if (angle > sightAngle / 2.0f) {
-                continue; // Boid is outside field of view
-            }
-
-            // Add boid's position to center of mass calculation
             centerOfMass.add(boid->boidGetPosition());
             boidsInSight++;
         }
     }
 
-    // Only calculate center of mass if more than 20 boids are in sight
-    if (boidsInSight >= 20) {
-        // Calculate the center of mass of the boids in sight
+    if (boidsInSight > 0) {
         centerOfMass.multiplyScalar(1.0f / boidsInSight);
-        //std::cout << centerOfMass << std::endl;                                                             //debug
-        return centerOfMass; // Return the center of mass to be used by the attack logic
+        return centerOfMass;
     }
 
-    // Return a default vector (e.g., zero vector) if no valid target
-    return threepp::Vector3(0, 0, 0);
+    return threepp::Vector3(0, 0, 0); // Default target if none found
 }
 
-
 void Predator::predatorAttackPoint(const threepp::Vector3& target) {
-
-
     if (target.length() == 0) {
-        return;  // No valid target to attack
+        return; // No valid target
     }
-
-    float originalMaxSpeed = maxSpeed;
-    float originalMaxForce = maxForce;
-
-    maxSpeed *= 3;
-    maxForce *= 3;
 
     threepp::Vector3 direction = target - position;
-    direction.normalize();
-
-    threepp::Vector3 desiredVelocity = direction * maxSpeed;
-
-    threepp::Vector3 steering = desiredVelocity - velocity;
-
-    steering *= 3;
-
-    if (steering.length() > maxForce) {
-        steering.normalize();
-        steering.multiplyScalar(maxForce);
+    if (direction.length() == 0) {
+        direction.set(1.0f, 0.0f, 0.0f); // Default direction
+    } else {
+        direction.normalize();
     }
 
-    if(predatorOutOfBounds) {
-        steering *= 0.5;
+    threepp::Vector3 desiredVelocity = direction * maxSpeed * 3; // Boost speed during attack
+    threepp::Vector3 steering = desiredVelocity - velocity;
+
+    if (steering.length() > maxForce * 3) {
+        steering.normalize();
+        steering.multiplyScalar(maxForce * 3);
     }
 
     acceleration.add(steering);
-
-    maxSpeed = originalMaxSpeed;
-    maxForce = originalMaxForce;
 }
+
 
 void Predator::predatorApplyRandomForce(){
 
@@ -176,9 +161,7 @@ void Predator::predatorUpdatePredator(const std::vector<Flock*>& flocks) {
         predatorApplyRandomForce();
     }
 
-
     predatorAttackPoint(predatorCalculateAttackPoint(flocks));
-
 
     predatorUpdateVelocity();
     predatorUpdatePosition();
@@ -270,7 +253,10 @@ const bool Predator::predatorGetOutOfBoundsCheck() const {
     return false;
 }
 
-const int Predator::predatorCalculateSightAngle() const {
-    return 0;
-}
+bool Predator::predatorInProximity(const Predator& otherPredator, float range) const {
 
+    threepp::Vector3 distanceVector = this->position - otherPredator.position;
+    float distance = distanceVector.length();
+
+    return distance < range;
+}

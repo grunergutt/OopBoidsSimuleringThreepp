@@ -11,31 +11,28 @@
 
 int main() {
 
-    int numberOfBoidsFlock1 = 200;
+    int numberOfBoidsFlock1 = 120;
     Flock flock1;
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
         flock1.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock2 = 0;
+    int numberOfBoidsFlock2 = 80;
     Flock flock2;
     for (int i = 0; i < numberOfBoidsFlock2; i++) {
         flock2.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock3 = 0;
+    int numberOfBoidsFlock3 = 40;
     Flock flock3;
     for (int i = 0; i < numberOfBoidsFlock3; i++) {
         flock3.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock4 = 0;
-    Flock flock4;
-    for (int i = 0; i < numberOfBoidsFlock4; i++) {
-        flock4.flockAddBoid(std::make_unique<Boid>(i));
-    }
 
-    int numberOfPredatorsPack1 = 5;
+    std::vector<Flock*> flocks = {&flock1, &flock2, &flock3};
+
+    int numberOfPredatorsPack1 = 3;
     for (int i = 0; i < numberOfPredatorsPack1; i++) {
         pack1.packAddPredator(std::make_unique<Predator>(i));
     }
@@ -85,13 +82,11 @@ int main() {
     auto flock1Group = createAnimationGroupForFlock(flock1, threepp::Color::yellow, boidCones1, 1);
     auto flock2Group = createAnimationGroupForFlock(flock2, threepp::Color::cyan, boidCones2, 1);
     auto flock3Group = createAnimationGroupForFlock(flock3, threepp::Color::darkblue, boidCones3, 1);
-    auto flock4Group = createAnimationGroupForFlock(flock4, threepp::Color::brown, boidCones4, 1);
     auto predatorsGroup = createAnimationGroupForPack(pack1, threepp::Color::red, predators, 4);
 
     scene->add(flock1Group);
     scene->add(flock2Group);
     scene->add(flock3Group);
-    scene->add(flock4Group);
     scene->add(predatorsGroup);
 
     threepp::Clock clock;
@@ -99,8 +94,7 @@ int main() {
         flock1.flockUpdateFlock();
         flock2.flockUpdateFlock();
         flock3.flockUpdateFlock();
-        flock4.flockUpdateFlock();
-        pack1.packUpdatePack();
+        pack1.packUpdatePack(flocks);
 
         for (int i = 0; i < flock1.flockGetNumBoids(); i++) {
             const Boid& boid = flock1.getBoidByIndex(i);
@@ -129,14 +123,6 @@ int main() {
             rotateConeTowardsVelocity(boidCones3[i], boidVelocity);
         }
 
-        for (int i = 0; i < flock4.flockGetNumBoids(); i++) {
-            const Boid& boid = flock4.getBoidByIndex(i);
-            threepp::Vector3 boidPosition = boid.boidGetPosition();
-            threepp::Vector3 boidVelocity = boid.boidGetVelocity();
-
-            boidCones4[i]->position.copy(boidPosition);
-            rotateConeTowardsVelocity(boidCones4[i], boidVelocity);
-        }
 
         for (int i = 0; i < pack1.packGetNumPredators(); i++) {
             const Predator& predator = pack1.packGetPredatorByIndex(i);

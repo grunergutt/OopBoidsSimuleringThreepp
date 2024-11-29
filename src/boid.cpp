@@ -4,7 +4,7 @@
 #include "utilityfunctions.hpp"
 #include <iostream>
 
-float borderInvisiblePercentage = 0.7;                                 // between 0 and 1
+float borderInvisiblePercentage = 0.75;                                 // between 0 and 1
 int speedForceRandomDampener = 100;
 
 Boid::Boid(int identifier, int sightRangeInitializer, bool outOfBoundsStatus,  bool boidScaredStatus,
@@ -73,7 +73,7 @@ void Boid::boidUpdateBoid() {
     boidCalculateFearFactor();
 
     if (boidGetBoidOutOfBoundsCheck()) {
-        float nudgeForce = maxForce/10;
+        float nudgeForce = maxForce/5;
         boidNudgeBoidAwayFromBorder(nudgeForce);
     }
 
@@ -123,17 +123,17 @@ void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
 
     if (std::abs(position.x) > invisibleWidth) {
         float scaleFactor = (std::abs(position.x) - invisibleWidth) / (arenaWidth - invisibleWidth);
-        scaleX = std::pow(scaleFactor, 2.0f); // Quadratic scaling for stronger growth near hard border
+        scaleX = std::pow(scaleFactor, 5.0f); // Quadratic scaling for stronger growth near hard border
     }
 
     if (std::abs(position.y) > invisibleHeight) {
         float scaleFactor = (std::abs(position.y) - invisibleHeight) / (arenaHeight - invisibleHeight);
-        scaleY = std::pow(scaleFactor, 2.0f); // Quadratic scaling for stronger growth near hard border
+        scaleY = std::pow(scaleFactor, 5.0f); // Quadratic scaling for stronger growth near hard border
     }
 
     if (std::abs(position.z) > invisibleDepth) {
         float scaleFactor = (std::abs(position.z) - invisibleDepth) / (arenaDepth - invisibleDepth);
-        scaleZ = std::pow(scaleFactor, 2.0f); // Quadratic scaling for stronger growth near hard border
+        scaleZ = std::pow(scaleFactor, 5.0f); // Quadratic scaling for stronger growth near hard border
     }
 
     // Calculate nudge force if outside invisible border
@@ -163,7 +163,7 @@ void Boid::boidFleeFromPredator() {
 
     float closestDistance = std::numeric_limits<float>::max();
     threepp::Vector3 closestPredatorPosition;
-    float scaredDampener = std::pow(2.0f, fearFactor - 7) / speedForceRandomDampener;
+    float scaredDampener = std::pow(2.5f, fearFactor - 7) / speedForceRandomDampener;
 
     const std::vector<std::unique_ptr<Predator>>& predators = pack1.packGetPredators();
 

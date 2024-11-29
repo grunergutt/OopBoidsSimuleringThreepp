@@ -33,9 +33,9 @@ class Predator {
         int fieldOfView = 180,
         bool outOfBoundsStatus = false,
         bool attackingStatus = false,
-        float maxSpeedInitializer = 50.0f,
-        float maxForceInitializer = 10.0f,
-        float randomFactorInitializer = 0.5f);
+        float maxSpeedInitializer = 25.0f,
+        float maxForceInitializer = 2.0f,
+        float randomFactorInitializer = 0.1f);
 
     threepp::Vector3 predatorCalculateAttackPoint(const std::vector<Flock*>& flocks);
     void predatorAttackPoint(const threepp::Vector3& target);
@@ -53,8 +53,7 @@ class Predator {
     const threepp::Vector3& predatorGetVelocity() const;
     const threepp::Vector3& predatorGetAcceleration() const;
     const bool predatorGetOutOfBoundsCheck() const;
-
-    const int predatorCalculateSightAngle() const;
+    bool predatorInProximity(const Predator& otherPredator, float range) const;
 
     void setPredatorSightDistance(int distance){sightRange = distance;};
     void setPredatorAgression(int agressionLevel){aggression = agressionLevel;};
