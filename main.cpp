@@ -6,8 +6,11 @@
 #include "predator.hpp"
 #include "pack.hpp"
 #include <imgui.h>
-#include <iostream>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
+
+
 
 
 int main() {
@@ -89,6 +92,10 @@ int main() {
     scene->add(flock2Group);
     scene->add(flock3Group);
     scene->add(predatorsGroup);
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     threepp::Clock clock;
     canvas.animate([&] {
