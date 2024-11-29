@@ -2,7 +2,6 @@
 #define PREDATOR_HPP
 
 #include "threepp/threepp.hpp"
-#include "arena.hpp"
 
 class Boid;
 class Flock;
@@ -30,12 +29,12 @@ class Predator {
 
     Predator();
   Predator(int predatorIdentifier,
-        int fieldOfView = 180,
+        int fieldOfView = 270,
         bool outOfBoundsStatus = false,
         bool attackingStatus = false,
         float maxSpeedInitializer = 25.0f,
-        float maxForceInitializer = 2.0f,
-        float randomFactorInitializer = 0.1f);
+        float maxForceInitializer = 1.5f,
+        float randomFactorInitializer = 0.2f);
 
     threepp::Vector3 predatorCalculateAttackPoint(const std::vector<Flock*>& flocks);
     void predatorAttackPoint(const threepp::Vector3& target);

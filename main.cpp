@@ -3,6 +3,7 @@
 #include "boid.hpp"
 #include "flock.hpp"
 #include "threeppfunctions.hpp"
+#include "predator.hpp"
 #include "pack.hpp"
 #include <imgui.h>
 #include <iostream>
@@ -17,13 +18,13 @@ int main() {
         flock1.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock2 = 80;
+    int numberOfBoidsFlock2 = 120;
     Flock flock2;
     for (int i = 0; i < numberOfBoidsFlock2; i++) {
         flock2.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock3 = 40;
+    int numberOfBoidsFlock3 = 0;
     Flock flock3;
     for (int i = 0; i < numberOfBoidsFlock3; i++) {
         flock3.flockAddBoid(std::make_unique<Boid>(i));

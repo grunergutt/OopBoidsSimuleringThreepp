@@ -1,4 +1,5 @@
 #include "boid.hpp"
+#include "arena.hpp"
 #include "pack.hpp"
 #include "predator.hpp"
 #include "utilityfunctions.hpp"

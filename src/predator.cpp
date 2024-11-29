@@ -1,9 +1,7 @@
-
-
-
 #include "predator.hpp"
 #include "utilityfunctions.hpp"
 #include "boid.hpp"
+#include "arena.hpp"
 #include <cmath>
 #include "flock.hpp"
 #include <iostream>
@@ -31,7 +29,7 @@ Predator::Predator(int predatorIdentifier,
     identifier(predatorIdentifier),
     aggression(0),
     sightAngle(fieldOfView),
-    sightRange(arena.getArenaDepth() / 2),
+    sightRange(arena.getArenaDepth() / 4),
     attacking(attackingStatus),
     predatorOutOfBounds(outOfBoundsStatus),
     maxSpeed(maxSpeedInitializer / static_cast<float>(speedForceRandomDampener)),
