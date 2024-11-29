@@ -27,10 +27,6 @@ Predator::Predator(int predatorIdentifier,
     randomForceFactor(randomFactorInitializer / static_cast<float>(speedForceRandomDampener)),
     dampingFactor(0.9f) {}
 
-void Predator::predatorSpawnPredator() {
-
-}
-void predatorKillPredator();
 
 void predatorCalculateAttackPoint();
 void predatorAttack();
