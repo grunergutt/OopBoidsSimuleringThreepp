@@ -171,9 +171,9 @@ void Predator::predatorNudgePredatorAwayFromBorder(float nudgeStrength) {
     float arenaWidth = arena.getArenaWidth() / 2;
     float arenaHeight = arena.getArenaHeight() / 2;
     float arenaDepth = arena.getArenaDepth() / 2;
-    float invisibleWidth = arenaWidth * borderInvisiblePercentage;
-    float invisibleHeight = arenaHeight * borderInvisiblePercentage;
-    float invisibleDepth = arenaDepth * borderInvisiblePercentage;
+    float invisibleWidth = arenaWidth * borderInvisiblePercentage*borderInvisiblePercentage;
+    float invisibleHeight = arenaHeight * borderInvisiblePercentage*borderInvisiblePercentage;
+    float invisibleDepth = arenaDepth * borderInvisiblePercentage*borderInvisiblePercentage;
 
     threepp::Vector3 nudgePoint(0, 0, 0);
     threepp::Vector3 directionToOrigin = nudgePoint - position;

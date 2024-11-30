@@ -5,7 +5,7 @@
 #include "utilityfunctions.hpp"
 #include <iostream>
 
-float borderInvisiblePercentage = 0.75;                                 // between 0 and 1
+float borderInvisiblePercentage = 0.6;                                 // between 0 and 1
 int speedForceRandomDampener = 100;
 
 Boid::Boid(int identifier, int sightRangeInitializer, bool outOfBoundsStatus,  bool boidScaredStatus,
@@ -89,24 +89,6 @@ void Boid::boidUpdateBoid() {
     //std::cout << "Boid maxSpeed: " << maxSpeed << "\n" << "Boid maxForce: " << maxForce << std::endl;             //debug
 }
 
-void Boid::boidConstrainToPhysicalBorders() {
-    float width = arena.getArenaWidth();
-    float height= arena.getArenaHeight();
-    float depth = arena.getArenaDepth();
-
-    if (position.x >= width / 2 || position.x <= -width / 2) {
-        acceleration.x *= -1;
-        position.x = std::clamp(position.x, -width / 2, width / 2);
-    }
-    if (position.y >= height / 2 || position.y <= -height / 2) {
-        acceleration.y *= -1;
-        position.y = std::clamp(position.y, -height / 2, height / 2);
-    }
-    if (position.z >= depth / 2 || position.z <= -depth / 2 ) {
-        acceleration.z *= -1;
-        position.z = std::clamp(position.z, -depth / 2, depth / 2);
-    }
-}
 
 void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
 
@@ -151,7 +133,7 @@ void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
 
 
         // Apply only the nudge force
-        boidApplyForce(nudgeForce);
+        boidApplyForce(nudgeForce*1.5f);
     }
 }
 

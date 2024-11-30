@@ -1,6 +1,7 @@
 #include "flock.hpp"
 #include "arena.hpp"
 #include "boid.hpp"
+#include <iostream>
 
 extern int speedForceRandomDampener;
 
@@ -104,6 +105,7 @@ void Flock::flockApplyFlockingForces() {
 void Flock::flockUpdateFlock() {
     flockApplyFlockingForces();
     for (auto& boid : boids) {
+        std::cout << separationRadius << " " << alignmentStrength<< " " << cohesionStrength<< " " << separationRadius<< " " << alignmentRadius<< " " << cohesionRadius << std::endl;
         boid->boidUpdateBoid();
     }
 }
@@ -136,4 +138,23 @@ bool Flock::flockGetBoidOutOfBoundsCheck(const std::unique_ptr<Boid>& boid) cons
         }
 
     return false;
+}
+
+float Flock::getSeparationStrength() {
+    return separationStrength;
+}
+float Flock::getAlignmentStrength() {
+    return alignmentStrength;
+}
+float Flock::getCohesionStrength() {
+    return cohesionStrength;
+}
+int Flock::getSeparationRadius() {
+    return separationRadius;
+}
+int Flock::getAlignmentRadius() {
+    return alignmentRadius;
+}
+int Flock::getCohesionRadius() {
+    return cohesionRadius;
 }

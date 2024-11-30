@@ -36,7 +36,6 @@ public:
     void boidUpdateVelocity();
     void boidUpdatePosition();
     void boidUpdateBoid();
-    void boidConstrainToPhysicalBorders();
     void boidNudgeBoidAwayFromBorder(float nudgeForce);
     void boidFleeFromPredator();
     void boidCalculateFearFactor();

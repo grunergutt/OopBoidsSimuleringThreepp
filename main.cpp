@@ -14,13 +14,13 @@
 
 int main() {
 
-    int numberOfBoidsFlock1 = 120;
+    int numberOfBoidsFlock1 = 1;
     Flock flock1;
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
         flock1.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock2 = 120;
+    int numberOfBoidsFlock2 = 0;
     Flock flock2;
     for (int i = 0; i < numberOfBoidsFlock2; i++) {
         flock2.flockAddBoid(std::make_unique<Boid>(i));
@@ -35,7 +35,7 @@ int main() {
 
     std::vector<Flock*> flocks = {&flock1, &flock2, &flock3};
 
-    int numberOfPredatorsPack1 = 3;
+    int numberOfPredatorsPack1 = 0;
     for (int i = 0; i < numberOfPredatorsPack1; i++) {
         pack1.packAddPredator(std::make_unique<Predator>(i));
     }
@@ -98,7 +98,13 @@ int main() {
     ImGui_ImplOpenGL3_Init("#version 150");
 
     // Slider for user input
-    float slider_value = 2.0f;
+
+    float setSeparationStrength = 10, previousSeparationStrength = setSeparationStrength;
+    float setAlignmentStrength = 0.15f, previousAlignmentStrength = setAlignmentStrength;
+    float setCohesionStrength = 0.1f, previousCohesionStrength = setCohesionStrength;
+    int setSeparationRadius = 10, previousSeparationRadius = setSeparationRadius;
+    int setAlignmentRadius = 15, previousAlignmentRadius = setAlignmentRadius;
+    int setCohesionRadius = 15, previousCohesionRadius = setCohesionRadius;
 
     threepp::Clock clock;
     canvas.animate([&] {
@@ -108,8 +114,61 @@ int main() {
         ImGui::NewFrame();
 
         // Add ImGui slider
-        ImGui::Begin("Slider Control");
-        ImGui::SliderFloat("Value", &slider_value, 0.0f, 4.0f);
+        ImGui::Begin("Flock Control Panel");
+        ImGui::SliderFloat("separationStrength", &setSeparationStrength, 5, 15);
+        ImGui::SliderFloat("alignmentStrength", &setAlignmentStrength, 0.05, 0.25);
+        ImGui::SliderFloat("cohesionStrength", &setCohesionStrength, 0.05, 0.2);
+        ImGui::SliderInt("separationRadius", &setSeparationRadius, 5, 25);
+        ImGui::SliderInt("alignmentRadius", &setAlignmentRadius, 10, 30);
+        ImGui::SliderInt("cohesionRadius", &setCohesionRadius, 10, 30);
+
+        if (setSeparationStrength != previousSeparationStrength) {
+        int separationDifference = setSeparationStrength - previousSeparationStrength;
+        for (auto& flock : flocks) {
+            flock->setSeparationRadius(flock->getSeparationRadius() + separationDifference);
+        }
+        previousSeparationStrength = setSeparationStrength; // Update previous value
+    }
+
+    if (setAlignmentStrength != previousAlignmentStrength) {
+        float alignmentDifference = setAlignmentStrength - previousAlignmentStrength;
+        for (auto& flock : flocks) {
+            flock->setAlignmentStrength(flock->getAlignmentStrength() + alignmentDifference);
+        }
+        previousAlignmentStrength = setAlignmentStrength; // Update previous value
+    }
+
+    if (setCohesionStrength != previousCohesionStrength) {
+        float cohesionDifference = setCohesionStrength - previousCohesionStrength;
+        for (auto& flock : flocks) {
+            flock->setCohesionStrength(flock->getCohesionStrength() + cohesionDifference);
+        }
+        previousCohesionStrength = setCohesionStrength; // Update previous value
+    }
+
+    if (setSeparationRadius != previousSeparationRadius) {
+        int separationRadiusDifference = setSeparationRadius - previousSeparationRadius;
+        for (auto& flock : flocks) {
+            flock->setSeparationRadius(flock->getSeparationRadius() + separationRadiusDifference);
+        }
+        previousSeparationRadius = setSeparationRadius; // Update previous value
+    }
+
+    if (setAlignmentRadius != previousAlignmentRadius) {
+        int alignmentRadiusDifference = setAlignmentRadius - previousAlignmentRadius;
+        for (auto& flock : flocks) {
+            flock->setAlignmentRadius(flock->getAlignmentRadius() + alignmentRadiusDifference);
+        }
+        previousAlignmentRadius = setAlignmentRadius; // Update previous value
+    }
+
+    if (setCohesionRadius != previousCohesionRadius) {
+        int cohesionRadiusDifference = setCohesionRadius - previousCohesionRadius;
+        for (auto& flock : flocks) {
+            flock->setCohesionRadius(flock->getCohesionRadius() + cohesionRadiusDifference);
+        }
+        previousCohesionRadius = setCohesionRadius; // Update previous value
+    }
         ImGui::End();
 
         flock1.flockUpdateFlock();

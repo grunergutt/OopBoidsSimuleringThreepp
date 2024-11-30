@@ -23,6 +23,7 @@ private:
     threepp::Vector3 flockCalculateCohesion(const Boid& boid);
 
 public:
+
     Flock()
         : separationStrength(10),
           alignmentStrength(0.15),
@@ -46,6 +47,14 @@ public:
     void setSeparationRadius(int radius) { separationRadius = radius; }
     void setAlignmentRadius(int radius) { alignmentRadius = radius; }
     void setCohesionRadius(int radius) { cohesionRadius = radius; }
+
+    float getSeparationStrength();
+    float getAlignmentStrength();
+    float getCohesionStrength();
+    int getSeparationRadius();
+    int getAlignmentRadius();
+    int getCohesionRadius();
+
 };
 
 #endif
