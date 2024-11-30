@@ -54,9 +54,9 @@ class Predator {
     const bool predatorGetOutOfBoundsCheck() const;
     bool predatorInProximity(const Predator& otherPredator, float range) const;
 
-    void setPredatorSightDistance(int distance){sightRange = distance;};
-    void setPredatorAgression(int agressionLevel){aggression = agressionLevel;};
-    void setPredatorPosition(const threepp::Vector3& newPosition){position = newPosition;};
+    void predatorSetPosition(const threepp::Vector3& position) {
+    this->position = position;
+  }
 
 
     };

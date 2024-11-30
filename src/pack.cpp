@@ -16,7 +16,7 @@ const int Pack::packGetNumPredators() {
     return static_cast<int>(predators.size());
 }
 
-const Predator& Pack::packGetPredatorByIndex(int index) const {
+Predator& Pack::packGetPredatorByIndex(int index) const {
     if (index < 0 || index >= predators.size()) {
         throw std::out_of_range("Index is out of bounds");
     }

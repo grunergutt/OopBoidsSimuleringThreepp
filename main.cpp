@@ -1,15 +1,16 @@
-#include "threepp/threepp.hpp"      // Threepp core
-#include "arena.hpp"                // Your custom class
-#include "boid.hpp"                 // Your custom class
-#include "flock.hpp"                // Your custom class
-#include "threeppfunctions.hpp"     // Your custom functions
-#include "predator.hpp"             // Your custom class
-#include "pack.hpp"                 // Your custom class
-#include <imgui.h>                  // ImGui core
-#include <imgui_impl_glfw.h>        // ImGui GLFW backend
-#include <imgui_impl_opengl3.h>     // ImGui OpenGL3 backend
+#include "arena.hpp"           // Your custom class
+#include "boid.hpp"            // Your custom class
+#include "flock.hpp"           // Your custom class
+#include "pack.hpp"            // Your custom class
+#include "predator.hpp"        // Your custom class
+#include "threepp/threepp.hpp" // Threepp core
+#include "threeppfunctions.hpp"// Your custom functions
+#include <GLFW/glfw3.h>        // GLFW library
+#include <imgui.h>             // ImGui core
+#include <imgui_impl_glfw.h>   // ImGui GLFW backend
+#include <imgui_impl_opengl3.h>// ImGui OpenGL3 backend
 #include <iostream>
-#include <GLFW/glfw3.h>             // GLFW library
+#include <utilityfunctions.hpp>
 
 
 int main() {
@@ -80,12 +81,12 @@ int main() {
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones2;
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones3;
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones4;
-    std::vector<std::shared_ptr<threepp::Mesh>> predators;
+    std::vector<std::shared_ptr<threepp::Mesh>> predatorCones;
 
     auto flock1Group = createAnimationGroupForFlock(flock1, threepp::Color::yellow, boidCones1, 1);
     auto flock2Group = createAnimationGroupForFlock(flock2, threepp::Color::cyan, boidCones2, 1);
     auto flock3Group = createAnimationGroupForFlock(flock3, threepp::Color::darkblue, boidCones3, 1);
-    auto predatorsGroup = createAnimationGroupForPack(pack1, threepp::Color::red, predators, 4);
+    auto predatorsGroup = createAnimationGroupForPack(pack1, threepp::Color::red, predatorCones, 4);
 
     scene->add(flock1Group);
     scene->add(flock2Group);
@@ -112,10 +113,16 @@ int main() {
     float setBoidRandomForce = 0.4, previousBoidRandomForce = setBoidRandomForce;
 
     bool simulatePredators = true;
+    std::vector<threepp::Vector3> lastPredatorPositions(pack1.packGetNumPredators(), threepp::Vector3());
+    for (int i = 0; i < pack1.packGetNumPredators(); i++) {
+        Predator& predator = pack1.packGetPredatorByIndex(i);
+        lastPredatorPositions[i] = predator.predatorGetPosition(); // Initialize with current positions
+    }
+
+    bool simulationSwitch = true;
 
     threepp::Clock clock;
     canvas.animate([&] {
-
         controls.enabled = !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -221,7 +228,9 @@ int main() {
         flock1.flockUpdateFlock();
         flock2.flockUpdateFlock();
         flock3.flockUpdateFlock();
-        pack1.packUpdatePack(flocks);
+        if (simulatePredators) {
+            pack1.packUpdatePack(flocks);
+        }
 
         for (int i = 0; i < flock1.flockGetNumBoids(); i++) {
             const Boid& boid = flock1.getBoidByIndex(i);
@@ -250,21 +259,46 @@ int main() {
             rotateConeTowardsVelocity(boidCones3[i], boidVelocity);
         }
 
-        if (simulatePredators) {
+        if (simulatePredators && simulationSwitch) {
+            for (int i = 0; i < pack1.packGetNumPredators(); i++) {
+                Predator& predator = pack1.packGetPredatorByIndex(i);
+
+        // Randomize position within arena boundaries
+                threepp::Vector3 randomPosition{
+                    getRandomFloat(-arena.getArenaHeight()/2, arena.getArenaHeight()/2),
+                    getRandomFloat(-arena.getArenaWidth()/2, arena.getArenaWidth()/2),
+                    getRandomFloat(-arena.getArenaDepth()/2, arena.getArenaDepth()/2)
+                };
+
+                predator.predatorSetPosition(randomPosition);
+                predatorCones[i]->position.copy(randomPosition); // Update visuals
+         }
+            simulationSwitch = false; // Prevent further reinitialization
+        }
+
+        if (simulatePredators && !simulationSwitch) {
             for (int i = 0; i < pack1.packGetNumPredators(); i++) {
                 const Predator& predator = pack1.packGetPredatorByIndex(i);
                 threepp::Vector3 predatorPosition = predator.predatorGetPosition();
                 threepp::Vector3 predatorVelocity = predator.predatorGetVelocity();
 
-                predators[i]->position.copy(predatorPosition);
-                rotateConeTowardsVelocity(predators[i], predatorVelocity);
+                predatorCones[i]->position.copy(predatorPosition);
+                rotateConeTowardsVelocity(predatorCones[i], predatorVelocity);
             }
-        } else {
-            for (int i = 0; i < pack1.packGetNumPredators(); i++) {
-                const Predator& predator = pack1.packGetPredatorByIndex(i);
-                threepp::Vector3 offScreeen(1000, 1000, 1000);
+        }
 
-                predators[i]->position.copy(offScreeen);
+        if (!simulatePredators) {
+            for (int i = 0; i < pack1.packGetNumPredators(); i++) {
+            Predator& predator = pack1.packGetPredatorByIndex(i);
+
+            // Save the current position
+            lastPredatorPositions[i] = predator.predatorGetPosition();
+
+            // Move predator off-screen
+            threepp::Vector3 offScreen(1000, 1000, 1000);
+            predator.predatorSetPosition(offScreen);
+            predatorCones[i]->position.copy(offScreen);
+                simulationSwitch = true;
             }
         }
 

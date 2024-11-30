@@ -24,7 +24,7 @@ class Pack {
 
     const std::vector<std::unique_ptr<Predator>>& packGetPredators() const;
     const int packGetNumPredators();
-    const Predator& packGetPredatorByIndex(int index) const;
+    Predator& packGetPredatorByIndex(int index) const;
     threepp::Vector3 packCalculateSeparation(const Predator& predator);
     void packUpdatePack(const std::vector<Flock*>& flocks);
 
