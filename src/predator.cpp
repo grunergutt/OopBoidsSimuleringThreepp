@@ -35,14 +35,10 @@ Predator::Predator(int predatorIdentifier,
     maxSpeed(maxSpeedInitializer / static_cast<float>(speedForceRandomDampener)),
     maxForce(maxForceInitializer / static_cast<float>(speedForceRandomDampener)),
     randomForceFactor(randomFactorInitializer / static_cast<float>(speedForceRandomDampener)),
-    dampingFactor(0.99f),
-    cooldownFrames(0){}
+    dampingFactor(0.99f){}
 
 
 threepp::Vector3 Predator::predatorCalculateAttackPoint(const std::vector<Flock*>& flocks) {
-    if (cooldownFrames > 0) {
-        return threepp::Vector3(0, 0, 0);
-    }
 
     threepp::Vector3 centerOfMass(0, 0, 0);
     int boidsInSight = 0;
@@ -211,10 +207,6 @@ void Predator::predatorNudgePredatorAwayFromBorder(float nudgeStrength) {
         // Apply only the nudge force
         predatorApplyForce(nudgeForce);
     }
-}
-
-void Predator::predatorNudgeAwayFromPredators(float nudgeForce) {
-
 }
 
 const threepp::Vector3& Predator::predatorGetPosition() const{

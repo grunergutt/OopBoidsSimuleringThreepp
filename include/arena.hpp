@@ -33,17 +33,17 @@ public:
   std::tuple<int, int, int> getCellIndices(const threepp::Vector3& position) const;                   //Gets a respective cell compared to a boids/predators given position
 
   void addBoid(const Boid* boid);                                                                     //adds a boid to boidgrid
-  std::vector<const Boid*> getNeighboringBoids(const Boid& boid, int range) const;                    //gets a boids neighbor based on its cellindency
+  std::vector<const Boid*> getNeighboringBoids(const Boid& boid, int range) const;                    //gets a boids neighbors based on its cellindency
 
-  void addPredator(const Predator* predator);
-  std::vector<const Predator*> getNeighboringPredators(const Predator& predator, int range) const;
+  void addPredator(const Predator* predator);                                                         //adds a predator to predatorgrid
+  std::vector<const Predator*> getNeighboringPredators(const Predator& predator, int range) const;    //gets a predators neighbors based on its cellindency
 
-  int getCellSize() const;
+  int getCellSize() const;                                                                            //getters
   int getArenaWidth() const;
   int getArenaHeight() const;
   int getArenaDepth() const;
 
-  void logBoidPositionsInGrid() const;
+  void logBoidPositionsInGrid() const;                                                                //debug logging for boid position
 };
 
 extern Arena arena;
