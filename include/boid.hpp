@@ -47,14 +47,13 @@ public:
     [[nodiscard]] bool boidGetBoidOutOfBoundsCheck() const;
     [[nodiscard]] bool boidGetBoidScaredCheck() const;
 
+    float boidGetMaxSpeed();
+    float boidGetMaxForce();
+    float boidGetRandomForce();
 
-    void boidSetMaxSpeed(float setMaxSpeed) {maxSpeed = setMaxSpeed;}
-    void boidSetMaxForce(float setMaxForce) {maxForce = setMaxForce;}
-    void boidSetRandomForce(float setRandomForceFactor) {randomForceFactor = setRandomForceFactor;}
-    void boidSetDampingFactor(float setDampingFactor) {dampingFactor = setDampingFactor;}
-    void boidSetFearFactor(int setFearFactor) {fearFactor = setFearFactor;}
-
-
+    void boidSetMaxSpeed(float setMaxSpeed);
+    void boidSetMaxForce(float setMaxForce);
+    void boidSetRandomForce(float setRandomForceFactor);
 
 };
 

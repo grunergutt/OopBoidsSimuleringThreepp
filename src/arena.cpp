@@ -103,6 +103,7 @@ int Arena::getArenaDepth() const {
     return depth;
 }
 
+
 void Arena::logBoidPositionsInGrid() const {
     for (int x = 0; x < xCells; ++x) {
         for (int y = 0; y < yCells; ++y) {

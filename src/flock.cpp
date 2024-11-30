@@ -105,7 +105,6 @@ void Flock::flockApplyFlockingForces() {
 void Flock::flockUpdateFlock() {
     flockApplyFlockingForces();
     for (auto& boid : boids) {
-        std::cout << separationRadius << " " << alignmentStrength<< " " << cohesionStrength<< " " << separationRadius<< " " << alignmentRadius<< " " << cohesionRadius << std::endl;
         boid->boidUpdateBoid();
     }
 }

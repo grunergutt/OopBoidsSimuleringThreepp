@@ -14,13 +14,13 @@
 
 int main() {
 
-    int numberOfBoidsFlock1 = 1;
+    int numberOfBoidsFlock1 = 120;
     Flock flock1;
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
         flock1.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock2 = 0;
+    int numberOfBoidsFlock2 = 120;
     Flock flock2;
     for (int i = 0; i < numberOfBoidsFlock2; i++) {
         flock2.flockAddBoid(std::make_unique<Boid>(i));
@@ -35,12 +35,12 @@ int main() {
 
     std::vector<Flock*> flocks = {&flock1, &flock2, &flock3};
 
-    int numberOfPredatorsPack1 = 0;
+    int numberOfPredatorsPack1 = 3;
     for (int i = 0; i < numberOfPredatorsPack1; i++) {
         pack1.packAddPredator(std::make_unique<Predator>(i));
     }
 
-    threepp::Canvas canvas("threepp demo", {{"aa", 4}});
+    threepp::Canvas canvas("threepp Boid And Predator Animation", {{"aa", 4}});
     threepp::GLRenderer renderer(canvas.size());
     renderer.autoClear = false;
 
@@ -96,6 +96,7 @@ int main() {
     ImGuiIO& io = ImGui::GetIO();
     ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)canvas.windowPtr(), true); // Correctly retrieve window handle
     ImGui_ImplOpenGL3_Init("#version 150");
+    controls.enabled = !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
 
     // Slider for user input
 
@@ -106,14 +107,20 @@ int main() {
     int setAlignmentRadius = 15, previousAlignmentRadius = setAlignmentRadius;
     int setCohesionRadius = 15, previousCohesionRadius = setCohesionRadius;
 
+    float setBoidSpeed = 20, previousBoidSpeed = setBoidSpeed;
+    float setBoidForce = 4, previousBoidForce = setBoidForce;
+    float setBoidRandomForce = 0.4, previousBoidRandomForce = setBoidRandomForce;
+
+    bool simulatePredators = true;
+
     threepp::Clock clock;
     canvas.animate([&] {
 
+        controls.enabled = !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // Add ImGui slider
         ImGui::Begin("Flock Control Panel");
         ImGui::SliderFloat("separationStrength", &setSeparationStrength, 5, 15);
         ImGui::SliderFloat("alignmentStrength", &setAlignmentStrength, 0.05, 0.25);
@@ -123,9 +130,9 @@ int main() {
         ImGui::SliderInt("cohesionRadius", &setCohesionRadius, 10, 30);
 
         if (setSeparationStrength != previousSeparationStrength) {
-        int separationDifference = setSeparationStrength - previousSeparationStrength;
-        for (auto& flock : flocks) {
-            flock->setSeparationRadius(flock->getSeparationRadius() + separationDifference);
+            float separationDifference = setSeparationStrength - previousSeparationStrength;
+            for (auto& flock : flocks) {
+                flock->setSeparationStrength(flock->getSeparationStrength() + separationDifference);
         }
         previousSeparationStrength = setSeparationStrength; // Update previous value
     }
@@ -171,6 +178,46 @@ int main() {
     }
         ImGui::End();
 
+        ImGui::Begin("Boid Control Panel");
+        ImGui::SliderFloat("Max Speed", &setBoidSpeed, 10, 30);
+        ImGui::SliderFloat("Max Force", &setBoidForce, 2, 6);
+        ImGui::SliderFloat("Random Movement", &setBoidRandomForce, 0.0, 0.8);
+
+        if (setBoidSpeed != previousBoidSpeed) {
+            for (auto& flock : flocks) {
+                for (const auto& boid : flock->getBoids()) {
+                    boid->boidSetMaxSpeed(static_cast<float>(setBoidSpeed));
+                    }
+                }
+            previousBoidSpeed = setBoidSpeed;  // Update previous value
+        }
+
+        if (setBoidForce != previousBoidForce) {
+            for (auto& flock : flocks) {
+                for (const auto& boid : flock->getBoids()) {
+                    boid->boidSetMaxForce(static_cast<float>(setBoidForce));
+                    }
+                }
+            previousBoidForce = setBoidForce;  // Update previous value
+        }
+
+        if (setBoidRandomForce != previousBoidRandomForce) {
+            for (auto& flock : flocks) {
+                for (const auto& boid : flock->getBoids()) {
+                    boid->boidSetRandomForce(static_cast<float>(setBoidRandomForce));
+                    }
+                }
+            previousBoidRandomForce = setBoidRandomForce;  // Update previous value
+        }
+
+        ImGui::End();
+
+        ImGui::Begin("Predator Control Panel");
+        ImGui::Checkbox("Simulate Predators", &simulatePredators);
+
+        ImGui::End();
+
+
         flock1.flockUpdateFlock();
         flock2.flockUpdateFlock();
         flock3.flockUpdateFlock();
@@ -203,15 +250,22 @@ int main() {
             rotateConeTowardsVelocity(boidCones3[i], boidVelocity);
         }
 
+        if (simulatePredators) {
+            for (int i = 0; i < pack1.packGetNumPredators(); i++) {
+                const Predator& predator = pack1.packGetPredatorByIndex(i);
+                threepp::Vector3 predatorPosition = predator.predatorGetPosition();
+                threepp::Vector3 predatorVelocity = predator.predatorGetVelocity();
 
-        for (int i = 0; i < pack1.packGetNumPredators(); i++) {
-            const Predator& predator = pack1.packGetPredatorByIndex(i);
-            threepp::Vector3 predatorPosition = predator.predatorGetPosition();
-            threepp::Vector3 predatorVelocity = predator.predatorGetVelocity();
+                predators[i]->position.copy(predatorPosition);
+                rotateConeTowardsVelocity(predators[i], predatorVelocity);
+            }
+        } else {
+            for (int i = 0; i < pack1.packGetNumPredators(); i++) {
+                const Predator& predator = pack1.packGetPredatorByIndex(i);
+                threepp::Vector3 offScreeen(1000, 1000, 1000);
 
-            predators[i]->position.copy(predatorPosition);
-            rotateConeTowardsVelocity(predators[i], predatorVelocity);
-
+                predators[i]->position.copy(offScreeen);
+            }
         }
 
         renderer.clear();

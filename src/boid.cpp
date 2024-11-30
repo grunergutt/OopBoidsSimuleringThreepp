@@ -41,7 +41,6 @@ void Boid::boidApplyRandomForce() {
         acceleration.normalize();
         acceleration.multiplyScalar(maxForce);
     }
-    //std::cout << "Random: " << randomForce << " Acc: " << acceleration << std::endl;      //debug
 }
 
 void Boid::boidApplyForce(const threepp::Vector3& flockForce) {     // Function adds flocking forces calculated in flock class
@@ -86,7 +85,6 @@ void Boid::boidUpdateBoid() {
 
     boidUpdateVelocity();                                            // Chain update steps for animation frame by frame
     boidUpdatePosition();
-    //std::cout << "Boid maxSpeed: " << maxSpeed << "\n" << "Boid maxForce: " << maxForce << std::endl;             //debug
 }
 
 
@@ -99,7 +97,10 @@ void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
     float invisibleHeight = arenaHeight * borderInvisiblePercentage;
     float invisibleDepth = arenaDepth * borderInvisiblePercentage;
 
-    threepp::Vector3 nudgePoint(getRandomFloat(-invisibleWidth, invisibleWidth), getRandomFloat(-invisibleHeight, invisibleHeight), getRandomFloat(-invisibleDepth, invisibleDepth));
+    threepp::Vector3 nudgePoint(
+        getRandomFloat(-invisibleWidth, invisibleWidth),
+        getRandomFloat(-invisibleHeight, invisibleHeight),
+        getRandomFloat(-invisibleDepth, invisibleDepth));
     threepp::Vector3 directionToOrigin = nudgePoint - position;
 
     float scaleX = 0.0f, scaleY = 0.0f, scaleZ = 0.0f;
@@ -127,9 +128,9 @@ void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
         directionToOrigin.normalize();
 
         threepp::Vector3 nudgeForce = directionToOrigin * nudgeStrength;
-        nudgeForce.x *= scaleX; // Apply scaling in x-direction
-        nudgeForce.y *= scaleY; // Apply scaling in y-direction
-        nudgeForce.z *= scaleZ; // Apply scaling in z-direction
+        nudgeForce.x *= scaleX;
+        nudgeForce.y *= scaleY;
+        nudgeForce.z *= scaleZ;
 
 
         // Apply only the nudge force
@@ -139,7 +140,7 @@ void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
 
 
 void Boid::boidFleeFromPredator() {
-    //std::cout << boidScared << std::endl;                                                 //debug
+
     if (!boidScared) {
         return;
     }
@@ -167,9 +168,6 @@ void Boid::boidFleeFromPredator() {
 
     threepp::Vector3 fleeForce = (fleeDirection * scaredDampener);
 
-    //std::cout << fleeForce << std::endl;                                                  //debug
-    //std::cout << fearFactor << std::endl;                                                 //debug
-
     boidApplyForce(fleeForce);
 }
 
@@ -178,7 +176,7 @@ void Boid::boidCalculateFearFactor(){
 
     if (pack1.packGetPredators().empty()) {
         fearFactor = 0;
-        //std::cout << "no predators seen" << std::endl;                                  //debug
+
         return;
     }
 
@@ -204,7 +202,7 @@ void Boid::boidCalculateFearFactor(){
     boidScared = (fearFactor > 3.5);
 }
 
-const threepp::Vector3& Boid::boidGetPosition() const {                  // Access methods for use in main if needed
+const threepp::Vector3& Boid::boidGetPosition() const {
     return position;
 }
 
@@ -233,22 +231,61 @@ bool Boid::boidGetBoidOutOfBoundsCheck() const {
     if (position.x > width / 2 || position.x < -width / 2 ||
         position.y > height / 2 || position.y < -height / 2 ||
         position.z > depth / 2 || position.z < -depth / 2) {
-        //std::cout << "out of bounds" << std::endl;                              //debug
+
         return true;
         }
 
-    //std::cout << "not out of bounds" << std::endl;                              //debug
     return false;
 }
 
 
 bool Boid::boidGetBoidScaredCheck() const {
-
-    //std::cout << fearFactor << std::endl;                                       //debug
-
     return boidScared;
 }
 
+float Boid::boidGetMaxSpeed() {
+    return maxSpeed;
+}
+float Boid::boidGetMaxForce() {
+    return maxForce;
+}
+float Boid::boidGetRandomForce() {
+    return randomForceFactor;
+}
+
+void Boid::boidSetMaxSpeed(float setMaxSpeed) {
+    maxSpeed = setMaxSpeed/speedForceRandomDampener;
+
+    if (velocity.length() > maxSpeed) {
+        velocity.normalize();
+        velocity.multiplyScalar(maxSpeed);
+    }
+
+    if (velocity.length() == 0) {
+        velocity.set(1.0f, 1.0f, 0.0f);
+        velocity.normalize();
+        velocity.multiplyScalar(maxSpeed);
+    }
+}
+
+void Boid::boidSetMaxForce(float setMaxForce) {
+    maxForce = setMaxForce/speedForceRandomDampener;
+
+    if (acceleration.length() > maxForce) {
+        acceleration.normalize();
+        acceleration.multiplyScalar(maxForce);
+    }
+
+    if (acceleration.length() == 0) {
+        acceleration.set(1.0f, 1.0f, 0.0f);
+        acceleration.normalize();
+        acceleration.multiplyScalar(maxForce);
+    }
+}
+
+void Boid::boidSetRandomForce(float setRandomForce) {
+    randomForceFactor = setRandomForce/speedForceRandomDampener;
+}
 
 
 
