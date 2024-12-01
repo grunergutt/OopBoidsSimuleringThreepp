@@ -55,6 +55,10 @@ public:
     void boidSetMaxForce(float setMaxForce);
     void boidSetRandomForce(float setRandomForceFactor);
 
+    void boidSetPosition(const threepp::Vector3& setPosition){position = setPosition;};
+    void boidSetVelocity(const threepp::Vector3& setVelocity){velocity = setVelocity;};
+    void boidSetAcceleration(const threepp::Vector3& setAcceleration){acceleration = setAcceleration;};
+
 };
 
 #endif // BOID_HPP

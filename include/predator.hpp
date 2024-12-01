@@ -57,6 +57,9 @@ class Predator {
     this->position = position;
   }
 
+  void predatorSetVelocity(const threepp::Vector3& setVelocity){velocity = setVelocity;};
+  void predatorSetAcceleration(const threepp::Vector3& setAcceleration){acceleration = setAcceleration;};
+
 
     };
 

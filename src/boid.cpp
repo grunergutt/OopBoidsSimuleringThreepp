@@ -25,7 +25,7 @@ Boid::Boid(int identifier, int sightRangeInitializer, bool outOfBoundsStatus,  b
       maxSpeed(maxSpeedInitializer / speedForceRandomDampener),
       maxForce(maxForceInitializer / speedForceRandomDampener),
       randomForceFactor(randomFactorInitializer / speedForceRandomDampener),
-      dampingFactor(0.9f) {}
+      dampingFactor(1.0f) {}
 
 
 

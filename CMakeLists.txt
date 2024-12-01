@@ -5,6 +5,14 @@ set(CMAKE_CXX_STANDARD 20)
 
 # FetchContent for dependencies
 include(FetchContent)
+file(GLOB SRC_FILES src/*.cpp)
+
+FetchContent_Declare(
+        Catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        GIT_TAG v3.7.0
+)
+FetchContent_MakeAvailable(Catch2)
 
 # FetchContent: threepp
 set(THREEPP_BUILD_TESTS OFF)
@@ -39,6 +47,8 @@ add_library(imgui STATIC
         ${IMGUI_BACKEND_PATH}/imgui_impl_opengl3.cpp
 )
 
+
+
 target_include_directories(imgui PUBLIC
         ${imgui_SOURCE_DIR}
         ${IMGUI_BACKEND_PATH}
@@ -47,17 +57,26 @@ target_include_directories(imgui PUBLIC
 # Link ImGui with GLFW and threepp
 target_link_libraries(imgui PUBLIC threepp::threepp glfw)
 
-
 # Collect source files for the main project
-file(GLOB SRC_FILES src/*.cpp)
+enable_testing()
 
-# Add the main executable target
+add_executable(tests
+        tests.cpp
+        ${SRC_FILES}
+)
+
+target_link_libraries(tests PRIVATE Catch2::Catch2WithMain threepp::threepp imgui)
+
+add_test(NAME tests COMMAND tests)
+
+target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_include_directories(tests PRIVATE ${threepp_SOURCE_DIR}/../include)
+
 add_executable(BoidSimulation
         main.cpp
         ${SRC_FILES}
 )
 
-# Link dependencies to the main executable
 target_link_libraries(BoidSimulation PRIVATE threepp::threepp imgui)
 
 # Include directories for the project

@@ -42,6 +42,8 @@ public:
   int getArenaWidth() const;
   int getArenaHeight() const;
   int getArenaDepth() const;
+  std::vector<std::vector<std::vector<std::vector<const Boid*>>>> getBoidGrid() const;
+  std::vector<std::vector<std::vector<std::vector<const Predator*>>>> getPredatorGrid() const;
 
   void logBoidPositionsInGrid() const;                                                                //debug logging for boid position
 };

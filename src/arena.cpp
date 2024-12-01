@@ -36,6 +36,10 @@ void Arena::addBoid(const Boid* boid) {
 }
 
 std::vector<const Boid*> Arena::getNeighboringBoids(const Boid& boid, int range) const {                // searches for neighboring boids by
+if(range < 0 || range >= std::max({width, height, depth})) {
+    throw std::out_of_range("Arena::getNeighboringBoids, range too big");
+    return std::vector<const Boid*>{};
+}
     std::vector<const Boid*> neighbors;                                                                 // itterating over all neighboring cells in each
     auto [x, y, z] = getCellIndices(boid.boidGetPosition());                                   // direction based on a boids cell indency
     int xMin = std::max(0, x - range);                                                         // these lines sets the boundries on how far you should search
@@ -54,6 +58,9 @@ std::vector<const Boid*> Arena::getNeighboringBoids(const Boid& boid, int range)
                 }
             }
         }
+    }
+    if (neighbors.empty()) {
+        return std::vector<const Boid*>{};
     }
     return neighbors;
 }
@@ -103,6 +110,12 @@ int Arena::getArenaDepth() const {
     return depth;
 }
 
+std::vector<std::vector<std::vector<std::vector<const Boid*>>>> Arena::getBoidGrid() const {
+    return boidGrid;
+}
+std::vector<std::vector<std::vector<std::vector<const Predator*>>>> Arena::getPredatorGrid() const {
+    return predatorGrid;
+}
 
 void Arena::logBoidPositionsInGrid() const {                                                                // checks each cell in all directions
     for (int x = 0; x < xCells; ++x) {                                                                      // and checks if there is a boid there
