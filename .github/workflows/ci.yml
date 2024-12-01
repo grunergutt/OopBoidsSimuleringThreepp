@@ -18,21 +18,23 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}  # Ensure proper authentication
 
       - name: Set up CMake
         uses: actions/setup-cmake@v2
         with:
-          cmake-version: '3.21'
+          cmake-version: '3.21'  # Use a more recent version of CMake
 
       - name: Install dependencies
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             sudo apt-get update
-            sudo apt-get install -y libgtest-dev cmake build-essential g++ 
+            sudo apt-get install -y libgtest-dev cmake build-essential g++
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
             choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
-            refreshenv
+            refreshenv  # Ensures the newly installed tools are available
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install cmake
           fi
@@ -41,10 +43,13 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ..  # Ensure correct CMakeLists.txt and test configurations
-          cmake --build . --verbose  # Adds verbose output for troubleshooting
+          cmake ..  # CMake will automatically detect and configure the compiler based on the OS
+          cmake --build . --verbose  # Build the project with verbose output for troubleshooting
 
       - name: Run tests
         run: |
           cd build
-          ./tests  # Replace with your actual test executable name
+          ./my_test_executable  # Replace with your actual test executable name
+
+      - name: Clear Cache  # Optional: Clears any leftover cache between runs
+        run: git clean -fdx
