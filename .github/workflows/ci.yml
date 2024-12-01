@@ -12,8 +12,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]  # Testing across multiple platforms
-
+        os: [windows-latest, ubuntu-latest, macos-latest]  # Testing across multiple platforms
     runs-on: ${{ matrix.os }}  # This ensures the job runs on the OS specified in the matrix
 
     steps:
