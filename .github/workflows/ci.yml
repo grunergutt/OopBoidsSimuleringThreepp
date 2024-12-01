@@ -3,32 +3,32 @@ name: C++ CI
 on:
   push:
     branches:
-      - main  # Trigger the workflow for changes to the main branch
+      - main
   pull_request:
     branches:
-      - main  # Trigger the workflow for PRs targeting the main branch
+      - main
 
 jobs:
   build:
-    runs-on: windows-latest  # You can change this to macOS or Windows as needed
-
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]  # Testing across multiple platforms
 
+    runs-on: ${{ matrix.os }}  # This ensures the job runs on the OS specified in the matrix
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # Checkout your code from GitHub
+        uses: actions/checkout@v2
 
       - name: Set up CMake
         uses: actions/setup-cmake@v1
         with:
-          cmake-version: '3.19'  # Use the correct CMake version for your project
+          cmake-version: '3.19'
 
       - name: Set up GCC
         uses: actions/setup-gcc@v1
         with:
-          gcc-version: '10'  # Specify the correct GCC version for your project
+          gcc-version: '10'
 
       - name: Install dependencies
         run: |
@@ -37,12 +37,12 @@ jobs:
 
       - name: Build project
         run: |
-          mkdir build  # Create a build directory
-          cd build  # Move into the build directory
-          cmake ..  # Configure the project using CMake
-          make  # Build the project
+          mkdir build
+          cd build
+          cmake ..
+          make
 
       - name: Run tests
         run: |
-          cd build  # Move into the build directory where tests were compiled
-          ./tests  # Run the tests (adjust if your test executable name is different)
+          cd build
+          ./tests  # Adjust this if the name of your test executable is different
