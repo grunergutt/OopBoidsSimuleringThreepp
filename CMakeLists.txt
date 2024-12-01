@@ -58,7 +58,6 @@ target_include_directories(imgui PUBLIC
 target_link_libraries(imgui PUBLIC threepp::threepp glfw)
 
 # Collect source files for the main project
-enable_testing()
 
 add_executable(tests
         tests.cpp
@@ -67,10 +66,13 @@ add_executable(tests
 
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain threepp::threepp imgui)
 
+enable_testing()
 add_test(NAME tests COMMAND tests)
 
 target_include_directories(tests PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_include_directories(tests PRIVATE ${threepp_SOURCE_DIR}/../include)
+target_include_directories(tests PRIVATE ${Catch2_SOURCE_DIR}/single_include)
+
 
 add_executable(BoidSimulation
         main.cpp

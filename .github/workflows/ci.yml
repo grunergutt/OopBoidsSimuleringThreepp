@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]  # Testing across multiple platforms
-    runs-on: ${{ matrix.os }}  # This ensures the job runs on the OS specified in the matrix
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout code
@@ -22,16 +22,17 @@ jobs:
       - name: Set up CMake
         uses: actions/setup-cmake@v2
         with:
-          cmake-version: '3.21'  # Use a more recent version of CMake
+          cmake-version: '3.21'
 
       - name: Install dependencies
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             sudo apt-get update
-            sudo apt-get install -y libgtest-dev cmake build-essential g++
+            sudo apt-get install -y libgtest-dev cmake build-essential g++ 
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System'
-            choco install visualstudio2019buildtools
+            choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
+            refreshenv
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install cmake
           fi
@@ -40,10 +41,10 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ..  # CMake will automatically detect and configure the compiler based on the OS
-          cmake --build .  # Build the project
+          cmake ..  # Ensure correct CMakeLists.txt and test configurations
+          cmake --build . --verbose  # Adds verbose output for troubleshooting
 
       - name: Run tests
         run: |
           cd build
-          ./tests  # Adjust if the name of your test executable is different
+          ./tests  # Replace with your actual test executable name
