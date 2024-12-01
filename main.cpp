@@ -1,10 +1,10 @@
-#include "arena.hpp"           // Your custom class
-#include "boid.hpp"            // Your custom class
-#include "flock.hpp"           // Your custom class
-#include "pack.hpp"            // Your custom class
-#include "predator.hpp"        // Your custom class
+#include "arena.hpp"
+#include "boid.hpp"
+#include "flock.hpp"
+#include "pack.hpp"
+#include "predator.hpp"
 #include "threepp/threepp.hpp" // Threepp core
-#include "threeppfunctions.hpp"// Your custom functions
+#include "threeppfunctions.hpp"
 #include <GLFW/glfw3.h>        // GLFW library
 #include <imgui.h>             // ImGui core
 #include <imgui_impl_glfw.h>   // ImGui GLFW backend

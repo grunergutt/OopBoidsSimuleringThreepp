@@ -9,6 +9,7 @@ include(FetchContent)
 # FetchContent: threepp
 set(THREEPP_BUILD_TESTS OFF)
 set(THREEPP_BUILD_EXAMPLES OFF)
+
 FetchContent_Declare(
         threepp
         GIT_REPOSITORY https://github.com/markaren/threepp.git
@@ -45,6 +46,7 @@ target_include_directories(imgui PUBLIC
 
 # Link ImGui with GLFW and threepp
 target_link_libraries(imgui PUBLIC threepp::threepp glfw)
+
 
 # Collect source files for the main project
 file(GLOB SRC_FILES src/*.cpp)
