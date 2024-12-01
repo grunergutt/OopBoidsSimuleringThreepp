@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # You can change this to macOS or Windows as needed
+    runs-on: windows-latest  # You can change this to macOS or Windows as needed
 
     strategy:
       matrix:
