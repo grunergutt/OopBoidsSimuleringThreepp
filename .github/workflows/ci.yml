@@ -24,13 +24,14 @@ jobs:
         with:
           cmake-version: '3.21'  # Use a more recent version of CMake
 
-      - name: Set up GCC or MSVC
+      - name: Set up MSVC (Visual Studio)
         if: runner.os == 'Windows'
-        run: |
-          echo "Using MSVC compiler for Windows"
-          set "CXX=cl"
-          set "CC=cl"
-        else: runner.os == 'ubuntu-latest' || runner.os == 'macos-latest'
+        uses: microsoft/setup-msbuild@v1  # This sets up MSVC for Visual Studio on Windows
+        with:
+          vs-version: '2022'  # Use Visual Studio 2019 (or adjust if you're using a different version)
+
+      - name: Set up GCC
+        if: runner.os != 'Windows'  # Set up GCC for non-Windows systems (Ubuntu/macOS)
         uses: actions/setup-gcc@v1
         with:
           gcc-version: '10'
@@ -50,7 +51,7 @@ jobs:
           mkdir build
           cd build
           cmake ..
-          make
+          cmake --build .  # Use cmake to build the project, MSVC will be used on Windows
 
       - name: Run tests
         run: |
