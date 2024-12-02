@@ -1,5 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch_all.hpp>
+#include <catch2/catch_approx.hpp>
 #include "threepp/threepp.hpp"
 #include "arena.hpp"
 #include "boid.hpp"
@@ -115,5 +116,83 @@ TEST_CASE("Boid velocity changes when updated"){
     CHECK(boid1.boidGetVelocity() == expectedVelocity);
 }
 
+TEST_CASE("Flock can store boid instances") {
+    Flock flock1;
 
+    Boid boid1(0,35, false, false, 20, 4, 0.4);
+    Boid boid2(1,35, false, false, 20, 4, 0.4);
 
+    flock1.flockAddBoid(std::make_unique<Boid>(boid1));
+    flock1.flockAddBoid(std::make_unique<Boid>(boid2));
+
+    CHECK(flock1.flockGetNumBoids() == 2);
+
+}
+
+TEST_CASE("Flock can get boid by index") {
+    Flock flock1;
+    flock1.flockAddBoid(std::make_unique<Boid>(0));
+    flock1.flockAddBoid(std::make_unique<Boid>(1));
+
+    CHECK(&flock1.getBoidByIndex(0) != &flock1.getBoidByIndex(1));
+}
+
+TEST_CASE("Flock can dynamicly change key variables") {
+    Flock flock1;
+    flock1.flockAddBoid(std::make_unique<Boid>(0));
+    flock1.flockAddBoid(std::make_unique<Boid>(1));
+
+    flock1.setAlignmentRadius(1);
+    CHECK(flock1.getAlignmentRadius() == 1);
+
+    flock1.setAlignmentRadius(2);
+    CHECK(flock1.getAlignmentRadius() == 2);
+
+}
+
+TEST_CASE("Flock iterates over boids and changes Pos, Vel and Acc") {
+    int numberOfBoidsFlock1 = 10;
+    Flock flock1;
+    for (int i = 0; i < numberOfBoidsFlock1; i++) {
+        flock1.flockAddBoid(std::make_unique<Boid>(i));
+    }
+
+    Arena arena(5, 5, 5, 1);
+
+    for (auto &boid : flock1.getBoids()) {
+        threepp::Vector3 boidPosition = boid->boidGetPosition();
+        threepp::Vector3 boidVelocity = boid->boidGetVelocity();
+        threepp::Vector3 boidAcceleration = boid->boidGetAcceleration();
+        flock1.flockUpdateFlock();
+        CHECK(boid->boidGetPosition() != boidPosition);
+        CHECK(boid->boidGetVelocity() != boidVelocity);
+        CHECK(boid->boidGetAcceleration() != boidAcceleration);
+    }
+}
+
+TEST_CASE("Predator calculates meaningfull attack point") {
+    Arena arena(20, 20, 20, 5);
+
+    int numberOfBoidsFlock1 = 10;
+    Flock flock1;
+    for (int i = 0; i < numberOfBoidsFlock1; i++) {
+        flock1.flockAddBoid(std::make_unique<Boid>(i));
+    }
+
+    threepp::Vector3 boidCentreOfMass;
+    for (const auto& boid : flock1.getBoids()) {
+        boid->boidSetPosition({10.0f, 4.0f, 1.0f});
+        boidCentreOfMass.x += boid->boidGetPosition().x;
+        boidCentreOfMass.y += boid->boidGetPosition().y;
+        boidCentreOfMass.z += boid->boidGetPosition().z;
+    }
+    boidCentreOfMass.multiplyScalar(1.0f / numberOfBoidsFlock1); //this is what predator does just with "boidsinsight"
+
+    std::vector<Flock*> flocks = {&flock1};
+
+    Predator predator(1, 360, false, false, 20, 4, 0.4);
+
+    CHECK(predator.predatorCalculateAttackPoint(flocks).x == Catch::Approx(boidCentreOfMass.x).epsilon(0.1));
+    CHECK(predator.predatorCalculateAttackPoint(flocks).y == Catch::Approx(boidCentreOfMass.y).epsilon(0.1));
+    CHECK(predator.predatorCalculateAttackPoint(flocks).z == Catch::Approx(boidCentreOfMass.z).epsilon(0.1));
+}

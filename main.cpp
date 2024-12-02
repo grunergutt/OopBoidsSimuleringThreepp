@@ -15,13 +15,13 @@
 
 int main() {
 
-    int numberOfBoidsFlock1 = 2;
+    int numberOfBoidsFlock1 = 120;
     Flock flock1;
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
         flock1.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock2 = 0;
+    int numberOfBoidsFlock2 = 120;
     Flock flock2;
     for (int i = 0; i < numberOfBoidsFlock2; i++) {
         flock2.flockAddBoid(std::make_unique<Boid>(i));
@@ -36,7 +36,7 @@ int main() {
 
     std::vector<Flock*> flocks = {&flock1, &flock2, &flock3};
 
-    int numberOfPredatorsPack1 = 0;
+    int numberOfPredatorsPack1 = 3;
     for (int i = 0; i < numberOfPredatorsPack1; i++) {
         pack1.packAddPredator(std::make_unique<Predator>(i));
     }

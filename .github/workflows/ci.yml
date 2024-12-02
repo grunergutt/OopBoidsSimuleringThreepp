@@ -1,13 +1,13 @@
 name: C++ CI
 
 #fikk ikke til å funke
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+#on:
+#  push:
+#    branches:
+#      - main
+#  pull_request:
+#    branches:
+ #     - main
 
 jobs:
   build:
