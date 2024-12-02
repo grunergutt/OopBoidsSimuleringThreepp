@@ -135,7 +135,7 @@ void Arena::logBoidPositionsInGrid() const {                                    
 }
 
 
-int borderSizes = 100;
+int borderSizes = 60;
 
 Arena arena(borderSizes, borderSizes, borderSizes, 5);      // an extern arena that can be used in other files
 

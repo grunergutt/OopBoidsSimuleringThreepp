@@ -73,8 +73,8 @@ void Flock::flockApplyFlockingForces() {
         arena.addBoid(boid.get());
     }
 
-    float dampener = 0.05f;
-    float scaredDampener = 0.05f;
+    float outOfBoundsDampener = 0.05f;
+    float scaredDampener = 0.12f;
 
     for (auto& boid : boids) {
         threepp::Vector3 separationForce = flockCalculateSeparation(*boid);
@@ -90,15 +90,15 @@ void Flock::flockApplyFlockingForces() {
 
         if(flockGetBoidOutOfBoundsCheck(boid) == true) {
 
-            cohesionForce *= dampener;
-            separationForce *= dampener;
-            alignmentForce *= dampener;
+            cohesionForce *= outOfBoundsDampener;
+            separationForce *= outOfBoundsDampener;
+            alignmentForce *= outOfBoundsDampener;
         }
 
 
-        boid->boidApplyForce(separationForce * dampener);
-        boid->boidApplyForce(alignmentForce * dampener);
-        boid->boidApplyForce(cohesionForce * dampener);
+        boid->boidApplyForce(separationForce * outOfBoundsDampener);
+        boid->boidApplyForce(alignmentForce * outOfBoundsDampener);
+        boid->boidApplyForce(cohesionForce * outOfBoundsDampener);
     }
 }
 

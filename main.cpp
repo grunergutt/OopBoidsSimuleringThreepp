@@ -15,13 +15,13 @@
 
 int main() {
 
-    int numberOfBoidsFlock1 = 90;
+    int numberOfBoidsFlock1 = 140;
     Flock flock1;
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
         flock1.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock2 = 90;
+    int numberOfBoidsFlock2 = 0;
     Flock flock2;
     for (int i = 0; i < numberOfBoidsFlock2; i++) {
         flock2.flockAddBoid(std::make_unique<Boid>(i));
@@ -36,7 +36,7 @@ int main() {
 
     std::vector<Flock*> flocks = {&flock1, &flock2, &flock3};
 
-    int numberOfPredatorsPack1 = 3;
+    int numberOfPredatorsPack1 = 2;
     for (int i = 0; i < numberOfPredatorsPack1; i++) {
         pack1.packAddPredator(std::make_unique<Predator>(i));
     }
@@ -101,7 +101,7 @@ int main() {
 
     // Slider for user input
 
-    float setSeparationStrength = 10, previousSeparationStrength = setSeparationStrength;
+    float setSeparationStrength = 2, previousSeparationStrength = setSeparationStrength;
     float setAlignmentStrength = 0.15f, previousAlignmentStrength = setAlignmentStrength;
     float setCohesionStrength = 0.1f, previousCohesionStrength = setCohesionStrength;
     int setSeparationRadius = 10, previousSeparationRadius = setSeparationRadius;
@@ -129,12 +129,12 @@ int main() {
         ImGui::NewFrame();
 
         ImGui::Begin("Flock Control Panel");
-        ImGui::SliderFloat("separationStrength", &setSeparationStrength, 5, 15);
-        ImGui::SliderFloat("alignmentStrength", &setAlignmentStrength, 0.05, 0.25);
-        ImGui::SliderFloat("cohesionStrength", &setCohesionStrength, 0.05, 0.2);
-        ImGui::SliderInt("separationRadius", &setSeparationRadius, 5, 25);
-        ImGui::SliderInt("alignmentRadius", &setAlignmentRadius, 10, 30);
-        ImGui::SliderInt("cohesionRadius", &setCohesionRadius, 10, 30);
+        ImGui::SliderFloat("separationStrength", &setSeparationStrength, 0.5, 4);
+        ImGui::SliderFloat("alignmentStrength", &setAlignmentStrength, 0.01, 0.3);
+        ImGui::SliderFloat("cohesionStrength", &setCohesionStrength, 0.01, 0.25);
+        ImGui::SliderInt("separationRadius", &setSeparationRadius, 5, 15);
+        ImGui::SliderInt("alignmentRadius", &setAlignmentRadius, 5, 15);
+        ImGui::SliderInt("cohesionRadius", &setCohesionRadius, 5, 15);
 
         if (setSeparationStrength != previousSeparationStrength) {
             float separationDifference = setSeparationStrength - previousSeparationStrength;
@@ -186,8 +186,8 @@ int main() {
         ImGui::End();
 
         ImGui::Begin("Boid Control Panel");
-        ImGui::SliderFloat("Max Speed", &setBoidSpeed, 10, 30);
-        ImGui::SliderFloat("Max Force", &setBoidForce, 2, 6);
+        ImGui::SliderFloat("Max Speed", &setBoidSpeed, 5, 35);
+        ImGui::SliderFloat("Max Force", &setBoidForce, 1, 7);
         ImGui::SliderFloat("Random Movement", &setBoidRandomForce, 0.0, 0.8);
 
         if (setBoidSpeed != previousBoidSpeed) {
