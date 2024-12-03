@@ -105,7 +105,7 @@ int main() {
     float setCohesionStrength = 0.1f, previousCohesionStrength = setCohesionStrength;
     int setSeparationRadius = 10, previousSeparationRadius = setSeparationRadius;
     int setAlignmentRadius = 10, previousAlignmentRadius = setAlignmentRadius;
-    int setCohesionRadius = 10, previousCohesionRadius = setCohesionRadius;
+    int setCohesionRadius = 15, previousCohesionRadius = setCohesionRadius;
 
     float setBoidSpeed = 20, previousBoidSpeed = setBoidSpeed;
     float setBoidForce = 4, previousBoidForce = setBoidForce;

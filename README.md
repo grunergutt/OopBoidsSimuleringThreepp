@@ -44,14 +44,19 @@ Krav:
 C++20 eller nyere.
 CMake 3.21 eller nyere.
 Installere nødvendige tredjepartsbiblioteker (threepp, Catch2, ImGui).
-Bygging:
 
+Bygging:
 Clone prosjektet.
 Kjør cmake for å konfigurere prosjektet.
 Bygg prosjektet med make eller ønsket byggesystem.
-Kjøring:
 
+Kjøring:
 Etter bygging, kjør ./BoidSimulation for å starte programmet.
+
+Unittests:
+For å kjøre ulike tester på programmet, kan man bytte run-konfigurasjonen om til tests.
+dette vil kjøre testene i tests.cpp ved hjelp av Catch2, disse har beskrivende overskrifter som
+viser hva som testes.
 
 Lisens
 Dette prosjektet er lisensiert under MIT-lisensen – se LICENSE for detaljer.

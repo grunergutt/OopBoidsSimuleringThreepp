@@ -5,13 +5,15 @@
 #include "utilityfunctions.hpp"
 #include <iostream>
 
-float borderInvisiblePercentage = 0.8;                                 // between 0 and 1
-int speedForceRandomDampener = 100;
+float borderInvisiblePercentage = 0.8;                                    // value between 0 and 1, decides how many percent of
+                                                                          // of full arena to use for outofbounds checks
+int speedForceRandomDampener = 100;                                       // dampens speed, maxforce and randomfactor, so main values dont
+                                                                          // look to small in imgui sliders
 
-Boid::Boid(int identifier, int sightRangeInitializer, bool outOfBoundsStatus,  bool boidScaredStatus,
-           float maxSpeedInitializer, float maxForceInitializer,
-           float randomFactorInitializer)
-:   position{threepp::Vector3{
+Boid::Boid(int identifier, int sightRangeInitializer, bool outOfBoundsStatus,  bool boidScaredStatus, // boid constructor, done here because
+           float maxSpeedInitializer, float maxForceInitializer,                                      // it relies on arena for random position
+           float randomFactorInitializer)                                                             // and doing this in hpp creates sircular
+    :   position{threepp::Vector3{                                                                    // dependencies, this goes for predator class also
          getRandomFloat(-arena.getArenaWidth() / 2, arena.getArenaWidth() / 2),
          getRandomFloat(-arena.getArenaHeight() / 2, arena.getArenaHeight() / 2),
          getRandomFloat(-arena.getArenaDepth() / 2, arena.getArenaDepth() / 2)}},
@@ -30,23 +32,23 @@ Boid::Boid(int identifier, int sightRangeInitializer, bool outOfBoundsStatus,  b
 
 
 void Boid::boidApplyRandomForce() {
-    threepp::Vector3 randomForce(                                    // Generate a random force with each component between -0.2 and 0.2
+    threepp::Vector3 randomForce(                                           // Generate a random force with each component between -0.2 and 0.2
         getRandomFloat(-randomForceFactor, randomForceFactor),
         getRandomFloat(-randomForceFactor, randomForceFactor),
         getRandomFloat(-randomForceFactor, randomForceFactor)
     );
 
     acceleration.add(randomForce);
-    if (acceleration.length() > maxForce) {                           // Limit the random force to maxForce to keep it within acceptable range
+    if (acceleration.length() > maxForce) {                                 // Limit the random force to maxForce to keep it within acceptable range
         acceleration.normalize();
         acceleration.multiplyScalar(maxForce);
     }
 }
 
-void Boid::boidApplyForce(const threepp::Vector3& flockForce) {     // Function adds flocking forces calculated in flock class
+void Boid::boidApplyForce(const threepp::Vector3& force) {                  // Function adds forces calculated in other places
 
-    acceleration.add(flockForce);
-    if (acceleration.length() > maxForce) {                         // Same as random force function.
+    acceleration.add(force);
+    if (acceleration.length() > maxForce) {                                 // Same as random force function.
         acceleration.normalize();
         acceleration.multiplyScalar(maxForce);
     }
@@ -69,10 +71,10 @@ void Boid::boidUpdatePosition() {
 
 }
 
-void Boid::boidUpdateBoid() {
-    boidCalculateFearFactor();
-
-    if (boidGetBoidOutOfBoundsCheck()) {
+void Boid::boidUpdateBoid() {                                        // Chains updates for animation frame by frame
+    boidCalculateFearFactor();                                       // also handles logic for if boid should
+                                                                     // fear and flee predators or not
+    if (boidGetBoidOutOfBoundsCheck()) {                             // as well as if boid should be contained to borders
         float nudgeForce = maxForce/5;
         boidNudgeBoidAwayFromBorder(nudgeForce);
     }
@@ -83,15 +85,15 @@ void Boid::boidUpdateBoid() {
 
     boidFleeFromPredator();
 
-    boidUpdateVelocity();                                            // Chain update steps for animation frame by frame
+    boidUpdateVelocity();
     boidUpdatePosition();
 }
 
 
-void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
-
-    float arenaWidth = arena.getArenaWidth() / 2;
-    float arenaHeight = arena.getArenaHeight() / 2;
+void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {               // creates a force towards a random point
+                                                                            // within the invisible borders of the arena
+    float arenaWidth = arena.getArenaWidth() / 2;                           // and pushes boid toward it based on distance
+    float arenaHeight = arena.getArenaHeight() / 2;                         // from wall
     float arenaDepth = arena.getArenaDepth() / 2;
     float invisibleWidth = arenaWidth * borderInvisiblePercentage;
     float invisibleHeight = arenaHeight * borderInvisiblePercentage;
@@ -107,20 +109,19 @@ void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
 
     if (std::abs(position.x) > invisibleWidth) {
         float scaleFactor = (std::abs(position.x) - invisibleWidth) / (arenaWidth - invisibleWidth);
-        scaleX = std::pow(scaleFactor, 5.0f); // Quadratic scaling for stronger growth near hard border
+        scaleX = std::pow(scaleFactor, 5.0f);
     }
 
     if (std::abs(position.y) > invisibleHeight) {
         float scaleFactor = (std::abs(position.y) - invisibleHeight) / (arenaHeight - invisibleHeight);
-        scaleY = std::pow(scaleFactor, 5.0f); // Quadratic scaling for stronger growth near hard border
+        scaleY = std::pow(scaleFactor, 5.0f);
     }
 
     if (std::abs(position.z) > invisibleDepth) {
         float scaleFactor = (std::abs(position.z) - invisibleDepth) / (arenaDepth - invisibleDepth);
-        scaleZ = std::pow(scaleFactor, 5.0f); // Quadratic scaling for stronger growth near hard border
+        scaleZ = std::pow(scaleFactor, 5.0f);
     }
 
-    // Calculate nudge force if outside invisible border
     if (std::abs(position.x) > invisibleWidth ||
         std::abs(position.y) > invisibleHeight ||
         std::abs(position.z) > invisibleDepth) {
@@ -132,34 +133,35 @@ void Boid::boidNudgeBoidAwayFromBorder(float nudgeStrength) {
         nudgeForce.y *= scaleY;
         nudgeForce.z *= scaleZ;
 
-
-        // Apply only the nudge force
         boidApplyForce(nudgeForce*1.5f);
     }
 }
 
 
-void Boid::boidFleeFromPredator() {
-
-    if (!boidScared) {
-        return;
+void Boid::boidFleeFromPredator() {                                         // checks if boid attribute boidScared is true (calculated
+                                                                            // in function under this), if not its not it stops.
+    if (!boidScared) {                                                      // if it is it finds the closest predator and calculates a
+        return;                                                             // scaling force similarly to boidnudgeawayfromborder.
     }
 
     float closestDistance = std::numeric_limits<float>::max();
     threepp::Vector3 closestPredatorPosition;
-    float scaredDampener = std::pow(2.5f, fearFactor - 7) / speedForceRandomDampener;
+    float scaredDampener = std::pow(2.5f, fearFactor - 7)
+    / speedForceRandomDampener;
 
-    const std::vector<std::unique_ptr<Predator>>& predators = pack1.packGetPredators();
+    const std::vector<std::unique_ptr<Predator>>& predators
+    = pack1.packGetPredators();
 
     for (const auto& predator : predators) {
-        float distanceLength = (position - predator->predatorGetPosition()).length();
+        float distanceLength = (position -
+            predator->predatorGetPosition()).length();
         if (distanceLength < closestDistance) {
             closestDistance = distanceLength;
             closestPredatorPosition = predator->predatorGetPosition();
         }
     }
 
-    threepp::Vector3 fleeDirection = position - closestPredatorPosition;
+    threepp::Vector3 fleeDirection = position - closestPredatorPosition;    // creates direction-vector away from predator
     if (fleeDirection.length() == 0) {
 
         fleeDirection = threepp::Vector3(1.0f, 0.0f, 0.0f);
@@ -171,9 +173,9 @@ void Boid::boidFleeFromPredator() {
     boidApplyForce(fleeForce);
 }
 
-void Boid::boidCalculateFearFactor(){
-    boidScared = false;
-
+void Boid::boidCalculateFearFactor(){                                       // calculates boids fear and manages boidScared and fearFactor attributes
+    boidScared = false;                                                     // checks if any predators is within sightange and calculates
+                                                                            // fearfactor linearly based on distance to predator
     if (pack1.packGetPredators().empty()) {
         fearFactor = 0;
 
@@ -194,15 +196,15 @@ void Boid::boidCalculateFearFactor(){
     }
 
     if (closestDistance < sightRange) {
-        float proximityFactor = 1.0f - (closestDistance / sightRange);
+        float proximityFactor = 1.0f - (closestDistance / sightRange);      // linear scaling
         fearAmount = proximityFactor * 10.0f;
     }
 
-    fearFactor = static_cast<int>(fearAmount);
+    fearFactor = static_cast<int>(fearAmount);                              // managing fearFactor and boidSCared
     boidScared = (fearFactor > 3.5);
 }
 
-const threepp::Vector3& Boid::boidGetPosition() const {
+const threepp::Vector3& Boid::boidGetPosition() const {                     // getters
     return position;
 }
 
@@ -219,7 +221,7 @@ int Boid::boidGetBoidIdentifier() const {
 }
 
 
-bool Boid::boidGetBoidOutOfBoundsCheck() const {
+bool Boid::boidGetBoidOutOfBoundsCheck() const {                            //checks if boid is outside of invisible borders
     float width = arena.getArenaWidth() * borderInvisiblePercentage;
     float height = arena.getArenaHeight() * borderInvisiblePercentage;
     float depth = arena.getArenaDepth() * borderInvisiblePercentage;
@@ -239,7 +241,7 @@ bool Boid::boidGetBoidOutOfBoundsCheck() const {
 }
 
 
-bool Boid::boidGetBoidScaredCheck() const {
+bool Boid::boidGetBoidScaredCheck() const {                                 // more getters
     return boidScared;
 }
 
@@ -253,8 +255,8 @@ float Boid::boidGetRandomForce() {
     return randomForceFactor;
 }
 
-void Boid::boidSetMaxSpeed(float setMaxSpeed) {
-    maxSpeed = setMaxSpeed/speedForceRandomDampener;
+void Boid::boidSetMaxSpeed(float setMaxSpeed) {                 // setters, these need to be contained with defensive
+    maxSpeed = setMaxSpeed/speedForceRandomDampener;            // programming because they might be bigger than maxspeed maxforce etc.
 
     if (velocity.length() > maxSpeed) {
         velocity.normalize();

@@ -30,7 +30,7 @@ public:
           cohesionStrength(0.1f),
           separationRadius(10),
           alignmentRadius(15),
-          cohesionRadius(15) {}
+          cohesionRadius(30) {}
 
     void flockAddBoid(std::unique_ptr<Boid> boid);                                      // adds an instance of boid to a flock
     void flockApplyFlockingForces();                                                    // calculates all flocking forces and adds it to a boid

@@ -9,6 +9,7 @@
 #include "predator.hpp"
 #include "threeppfunctions.hpp"
 #include "utilityfunctions.hpp"
+#include <iostream>
 
 TEST_CASE("Arena returns the correct cell indency") {
     Boid boid1(1, 35, false, false, 20, 4, 0.4);
@@ -181,7 +182,7 @@ TEST_CASE("Predator calculates meaningfull attack point") {
 
     threepp::Vector3 boidCentreOfMass;
     for (const auto& boid : flock1.getBoids()) {
-        boid->boidSetPosition({10.0f, 4.0f, 1.0f});
+        boid->boidSetPosition({10.0f, 4.0f, 7.5f});
         boidCentreOfMass.x += boid->boidGetPosition().x;
         boidCentreOfMass.y += boid->boidGetPosition().y;
         boidCentreOfMass.z += boid->boidGetPosition().z;
@@ -191,8 +192,96 @@ TEST_CASE("Predator calculates meaningfull attack point") {
     std::vector<Flock*> flocks = {&flock1};
 
     Predator predator(1, 360, false, false, 20, 4, 0.4);
+    predator.predatorSetPosition({0, 0, 0});
 
     CHECK(predator.predatorCalculateAttackPoint(flocks).x == Catch::Approx(boidCentreOfMass.x).epsilon(0.1));
     CHECK(predator.predatorCalculateAttackPoint(flocks).y == Catch::Approx(boidCentreOfMass.y).epsilon(0.1));
     CHECK(predator.predatorCalculateAttackPoint(flocks).z == Catch::Approx(boidCentreOfMass.z).epsilon(0.1));
+}
+
+TEST_CASE("Pack can hold and return instances of predator") {
+    Pack pack1;
+    Predator pred1(0);
+    Predator pred2(1);
+
+    pack1.packAddPredator(std::make_unique<Predator>(pred1));
+    pack1.packAddPredator(std::make_unique<Predator>(pred2));
+
+    CHECK(&pack1.packGetPredatorByIndex(1) != &pack1.packGetPredatorByIndex(0));
+    CHECK(pack1.packGetNumPredators() == 2);
+}
+
+TEST_CASE("Pack calculates repulsionforce for predators") {
+    Pack pack1;
+    Predator pred1(0);
+    pred1.predatorSetPosition({1, 1, 1});
+    Predator pred2(1);
+    pred2.predatorSetPosition({2, 2, 2});
+
+    pack1.packAddPredator(std::make_unique<Predator>(pred1));
+    pack1.packAddPredator(std::make_unique<Predator>(pred2));
+
+    arena.clearPredatorGrid();
+    for (const auto& predator : pack1.packGetPredators()) {
+        arena.addPredator(predator.get());
+    }
+
+    threepp::Vector3 repulsionForce;
+    repulsionForce = pack1.packCalculateSeparation(pred1);
+
+    CHECK(repulsionForce != threepp::Vector3(0, 0, 0));
+}
+
+TEST_CASE("Threeppfunctions createConeMeshForObject returns mesh") {
+    Boid boid(0);
+    std::shared_ptr<threepp::Mesh> boidCone = createConeMeshForObject(boid.boidGetPosition(),
+        threepp::Color::cyan,
+        5);
+
+    auto meshCheck = std::dynamic_pointer_cast<threepp::Mesh>(boidCone);
+    CHECK(boidCone != nullptr);
+}
+
+TEST_CASE("Threeppfunctions createAnimationGroupForFlock returns valid group") {
+    Boid boid0(0);
+    Flock flock1;
+    flock1.flockAddBoid(std::make_unique<Boid>(boid0));
+
+    std::vector<std::shared_ptr<threepp::Mesh>> boidCones1;
+
+    std::shared_ptr<threepp::Group> flockAnimationGroup = createAnimationGroupForFlock(flock1,
+        threepp::Color::cyan,
+        boidCones1, 1);
+
+    auto meshCheck = std::dynamic_pointer_cast<threepp::Group>(flockAnimationGroup);
+    CHECK(flockAnimationGroup != nullptr);
+}
+
+TEST_CASE("Threeppfunctions createAnimationGroupForPack returns valid group") {
+    Predator predator0(0);
+    Pack pack1;
+    pack1.packAddPredator(std::make_unique<Predator>(predator0));
+
+    std::vector<std::shared_ptr<threepp::Mesh>> predatorCones1;
+
+    std::shared_ptr<threepp::Group> packAnimationGroup = createAnimationGroupForPack(pack1,
+        threepp::Color::cyan,
+        predatorCones1, 1);
+
+    auto meshCheck = std::dynamic_pointer_cast<threepp::Group>(packAnimationGroup);
+    CHECK(packAnimationGroup != nullptr);
+}
+
+
+TEST_CASE("utilityfunctions getRandomFloat return random floating point number") {
+    float randomFloat = 11.0f;
+    randomFloat = getRandomFloat(0, 10);
+
+    bool withinBounds = false;
+    if (0 < randomFloat < 10) {
+        withinBounds = true;
+    }
+
+    CHECK(randomFloat != 11);
+    CHECK(withinBounds);
 }

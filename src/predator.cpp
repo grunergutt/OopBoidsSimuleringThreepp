@@ -10,12 +10,12 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-extern int speedForceRandomDampener;
-extern float borderInvisiblePercentage;
+extern int speedForceRandomDampener;                    // same as boid, dampens force so paramaters in imgui are not too small
+extern float borderInvisiblePercentage;                 // same border width as boid so they move in same arena parameters
 
-Predator::Predator(int predatorIdentifier,
-                   int fieldOfView,
-                   bool outOfBoundsStatus,
+Predator::Predator(int predatorIdentifier,              // predator constructor is placed here for same reason
+                   int fieldOfView,                     // as boid, becuse it relies on arena. this might create sircluar
+                   bool outOfBoundsStatus,              // dependency if used in hpp file.
                    bool attackingStatus,
                    float maxSpeedInitializer,
                    float maxForceInitializer,
@@ -37,36 +37,42 @@ Predator::Predator(int predatorIdentifier,
     dampingFactor(0.99f){}
 
 
-threepp::Vector3 Predator::predatorCalculateAttackPoint(const std::vector<Flock*>& flocks) {
+//slight gpt for help with logic
+threepp::Vector3 Predator::predatorCalculateAttackPoint(                    // calculates attack point by going through all boids within
+    const std::vector<Flock*>& flocks) {                                    // sight angle and range and getting their average position
 
     threepp::Vector3 centerOfMass(0, 0, 0);
     int boidsInSight = 0;
 
-    for (const auto& flock : flocks) {
-        for (const auto& boid : flock->getBoids()) {
-            threepp::Vector3 toBoid = boid->boidGetPosition() - position;
+    for (const auto& flock : flocks) {                           // itterates through flocks and then
+        for (const auto& boid : flock->getBoids()) {     // itterates through boids
+
+            threepp::Vector3 toBoid = boid->boidGetPosition() - position;   // gets the distance from predator to boid
             float distance = toBoid.length();
 
             if (distance > sightRange || sightRange <= 0) {
-                continue; // Skip if out of range
+                continue;                                                   // Skip if out of range
             }
 
             if (toBoid.length() == 0) {
-                toBoid.set(1.0f, 0.0f, 0.0f); // Default direction for zero-length vector
+                toBoid.set(1.0f, 0.0f, 0.0f);                         // Default direction for zero-length vector
             }
-            toBoid.normalize();
+            toBoid.normalize();                                             // normalizes for directional vector
 
-            threepp::Vector3 forward = velocity.length() > 0 ? velocity.normalize() : threepp::Vector3(1.0f, 0.0f, 0.0f);
+            threepp::Vector3 forward = velocity.length() > 0 ?              // Checks if the velocity vector has a non-zero
+                velocity.normalize()                                        // magnitude. If true, the direction of the velocity
+            : threepp::Vector3(1.0f, 0.0f, 0.0f);                     // is set to a false direction to avoid division by zero
+
             float dotProduct = forward.dot(toBoid);
             dotProduct = std::clamp(dotProduct, -1.0f, 1.0f);
 
-            float angle = std::acos(dotProduct) * (180.0f / M_PI);
+            float angle = std::acos(dotProduct) * (180.0f / M_PI);          // checks if boid is within sightangle
             if (angle > sightAngle / 2.0f) {
                 continue;
             }
 
-            centerOfMass.add(boid->boidGetPosition());
-            boidsInSight++;
+            centerOfMass.add(boid->boidGetPosition());                      // if a boid is within range and angle, add its position
+            boidsInSight++;                                                 // and make count go up by 1
         }
     }
 
@@ -75,36 +81,37 @@ threepp::Vector3 Predator::predatorCalculateAttackPoint(const std::vector<Flock*
         return centerOfMass;
     }
 
-    return threepp::Vector3(0, 0, 0); // Default target if none found
+    return threepp::Vector3(0, 0, 0);                                  // Default target if no boids are found
 }
 
-void Predator::predatorAttackPoint(const threepp::Vector3& target) {
-    if (target.length() == 0) {
-        return; // No valid target
+void Predator::predatorAttackPoint(const threepp::Vector3& target) {         // makes predator move in direction of
+    if (target.length() == 0) {                                              // a Vector3 target, (predatorCalculateAttackPoint)
+
+        return;                                                              // if the attack point is where the predator is, do nothing
     }
 
     threepp::Vector3 direction = target - position;
     if (direction.length() == 0) {
-        direction.set(1.0f, 0.0f, 0.0f); // Default direction
-    } else {
+        direction.set(1.0f, 0.0f, 0.0f);                               // Default direction, defensive check in case direction
+    } else {                                                                 // is zero
         direction.normalize();
     }
 
-    threepp::Vector3 desiredVelocity = direction * maxSpeed * 3; // Boost speed during attack
-    threepp::Vector3 steering = desiredVelocity - velocity;
+    threepp::Vector3 desiredVelocity = direction * maxSpeed * 3;            // Boost speed during attack
+    threepp::Vector3 steering = desiredVelocity - acceleration;                 // calculates where the predator should be moving
 
-    if (steering.length() > maxForce * 3) {
+    if (steering.length() > maxForce * 3) {                                 // makes rpedator move faster when valid target is around
         steering.normalize();
         steering.multiplyScalar(maxForce * 3);
     }
 
-    acceleration.add(steering);
+    acceleration.add(steering);                                             // adds the steering force to acceleration
 }
 
 
-void Predator::predatorApplyRandomForce(){
+void Predator::predatorApplyRandomForce(){                                  // Generate a random force based on randomforcefactor
 
-    threepp::Vector3 randomForce(                                    // Generate a random force with each component between -0.2 and 0.2
+    threepp::Vector3 randomForce(
         getRandomFloat(-randomForceFactor, randomForceFactor),
         getRandomFloat(-randomForceFactor, randomForceFactor),
         getRandomFloat(-randomForceFactor, randomForceFactor)
@@ -115,13 +122,13 @@ void Predator::predatorApplyRandomForce(){
         acceleration.normalize();
         acceleration.multiplyScalar(maxForce);
     }
-    //std::cout << "Random: " << randomForce << " Acc: " << acceleration << std::endl;  //debug
+
 }
 
-void Predator::predatorApplyForce(const threepp::Vector3& force) {     // Function adds flocking forces calculated in flock class
+void Predator::predatorApplyForce(const threepp::Vector3& force) {     // Function adds forces calculated elsewhere
 
     acceleration.add(force);
-    if (acceleration.length() > maxForce) {                                 // Same as random force function.
+    if (acceleration.length() > maxForce) {                            // Same as random force function.
         acceleration.normalize();
         acceleration.multiplyScalar(maxForce);
     }
@@ -144,9 +151,9 @@ void Predator::predatorUpdatePosition() {
 
 }
 
-void Predator::predatorUpdatePredator(const std::vector<Flock*>& flocks) {
-    if (predatorGetOutOfBoundsCheck()) {
-        float nudgeForce = maxForce / 10.0f;
+void Predator::predatorUpdatePredator(const std::vector<Flock*>& flocks) {  // chains steps so predator moves
+    if (predatorGetOutOfBoundsCheck()) {                                    // parameter here is flocks so predatorcalculateattackpoint
+        float nudgeForce = maxForce / 10.0f;                                // has all targets neccesary
         predatorNudgePredatorAwayFromBorder(nudgeForce);
     }
 
@@ -160,8 +167,8 @@ void Predator::predatorUpdatePredator(const std::vector<Flock*>& flocks) {
     predatorUpdatePosition();
 }
 
-void Predator::predatorNudgePredatorAwayFromBorder(float nudgeStrength) {
-    extern float borderInvisiblePercentage;
+void Predator::predatorNudgePredatorAwayFromBorder(float nudgeStrength) {   // this is an excapt copy of boidNudgeawayfromborder
+    extern float borderInvisiblePercentage;                                 // except it calculates a force for predators
 
     float arenaWidth = arena.getArenaWidth() / 2;
     float arenaHeight = arena.getArenaHeight() / 2;
@@ -177,20 +184,19 @@ void Predator::predatorNudgePredatorAwayFromBorder(float nudgeStrength) {
 
     if (std::abs(position.x) > invisibleWidth) {
         float scaleFactor = (std::abs(position.x) - invisibleWidth) / (arenaWidth - invisibleWidth);
-        scaleX = std::pow(scaleFactor, 5.0f); // Quadratic scaling for stronger growth near hard border
+        scaleX = std::pow(scaleFactor, 5.0f);
     }
 
     if (std::abs(position.y) > invisibleHeight) {
         float scaleFactor = (std::abs(position.y) - invisibleHeight) / (arenaHeight - invisibleHeight);
-        scaleY = std::pow(scaleFactor, 5.0f); // Quadratic scaling for stronger growth near hard border
+        scaleY = std::pow(scaleFactor, 5.0f);
     }
 
     if (std::abs(position.z) > invisibleDepth) {
         float scaleFactor = (std::abs(position.z) - invisibleDepth) / (arenaDepth - invisibleDepth);
-        scaleZ = std::pow(scaleFactor, 5.0f); // Quadratic scaling for stronger growth near hard border
+        scaleZ = std::pow(scaleFactor, 5.0f);
     }
 
-    // Calculate nudge force if outside invisible border
     if (std::abs(position.x) > invisibleWidth ||
         std::abs(position.y) > invisibleHeight ||
         std::abs(position.z) > invisibleDepth) {
@@ -198,17 +204,15 @@ void Predator::predatorNudgePredatorAwayFromBorder(float nudgeStrength) {
         directionToOrigin.normalize();
 
         threepp::Vector3 nudgeForce = directionToOrigin * nudgeStrength;
-        nudgeForce.x *= scaleX; // Apply scaling in x-direction
-        nudgeForce.y *= scaleY; // Apply scaling in y-direction
-        nudgeForce.z *= scaleZ; // Apply scaling in z-direction
+        nudgeForce.x *= scaleX;
+        nudgeForce.y *= scaleY;
+        nudgeForce.z *= scaleZ;
 
-
-        // Apply only the nudge force
         predatorApplyForce(nudgeForce);
     }
 }
 
-const threepp::Vector3& Predator::predatorGetPosition() const{
+const threepp::Vector3& Predator::predatorGetPosition() const{      // getters
     return position;
 }
 
@@ -220,7 +224,7 @@ const threepp::Vector3& Predator::predatorGetAcceleration() const {
     return acceleration;
 }
 
-const bool Predator::predatorGetOutOfBoundsCheck() const {
+const bool Predator::predatorGetOutOfBoundsCheck() const {              //out of bounds check for predator
 
     extern float borderInvisiblePercentage;
     float width = arena.getArenaWidth() * borderInvisiblePercentage;
@@ -234,18 +238,9 @@ const bool Predator::predatorGetOutOfBoundsCheck() const {
     if (position.x > width / 2 || position.x < -width / 2 ||
         position.y > height / 2 || position.y < -height / 2 ||
         position.z > depth / 2 || position.z < -depth / 2) {
-        //std::cout << "out of bounds" << std::endl;                              //debug
+
         return true;
         }
 
-    //std::cout << "not out of bounds" << std::endl;                              //debug
     return false;
-}
-
-bool Predator::predatorInProximity(const Predator& otherPredator, float range) const {
-
-    threepp::Vector3 distanceVector = this->position - otherPredator.position;
-    float distance = distanceVector.length();
-
-    return distance < range;
 }

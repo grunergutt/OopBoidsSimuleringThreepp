@@ -49,15 +49,14 @@ class Predator {
     const threepp::Vector3& predatorGetAcceleration() const;
     const bool predatorGetOutOfBoundsCheck() const;
 
-    bool predatorInProximity(const Predator& otherPredator,           // checks if another predator is in ones proximity
-      float range) const;
-
-    void predatorSetPosition(const threepp::Vector3& position) {      // setter for predators position
-    this->position = position;
-  }
+    void predatorSetPosition(const threepp::Vector3& position) {      // setter for predators position, its
+    this->position = position;                                        // different because animationloop in main
+  }                                                                   // removes predators.
 
   void predatorSetVelocity(const threepp::Vector3& setVelocity){velocity = setVelocity;};
   void predatorSetAcceleration(const threepp::Vector3& setAcceleration){acceleration = setAcceleration;};
+
+  void predatorSetMaxForce(const float& setMaxForce){maxForce = setMaxForce;};
 
 
     };

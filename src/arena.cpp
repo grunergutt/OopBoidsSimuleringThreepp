@@ -35,6 +35,7 @@ void Arena::addBoid(const Boid* boid) {
     boidGrid[x][y][z].push_back(boid);
 }
 
+//chatgpt
 std::vector<const Boid*> Arena::getNeighboringBoids(const Boid& boid, int range) const {                // searches for neighboring boids by
 if(range < 0 || range >= std::max({width, height, depth})) {
     throw std::out_of_range("Arena::getNeighboringBoids, range too big");
@@ -65,12 +66,14 @@ if(range < 0 || range >= std::max({width, height, depth})) {
     return neighbors;
 }
 
-void Arena::addPredator(const Predator* predator) {
+void Arena::addPredator(const Predator* predator) {                                                     // Adds predator to predatorgrid
     auto [x, y, z] = getCellIndices(predator->predatorGetPosition());
     predatorGrid[x][y][z].push_back(predator);
 }
 
-std::vector<const Predator*> Arena::getNeighboringPredators(const Predator& predator, int range) const {
+                                                                                                        // modified version of getNeighBoringPredators
+std::vector<const Predator*> Arena::getNeighboringPredators(const Predator& predator,
+    int range) const {
     std::vector<const Predator*> neighbors;
     auto [x, y, z] = getCellIndices(predator.predatorGetPosition());
     int xMin = std::max(0, x - range);
@@ -93,6 +96,8 @@ std::vector<const Predator*> Arena::getNeighboringPredators(const Predator& pred
     }
     return neighbors;
 }
+
+
 
 int Arena::getCellSize() const {                    //getters
     return cellSize;
@@ -120,7 +125,7 @@ std::vector<std::vector<std::vector<std::vector<const Predator*>>>> Arena::getPr
 void Arena::logBoidPositionsInGrid() const {                                                                // checks each cell in all directions
     for (int x = 0; x < xCells; ++x) {                                                                      // and checks if there is a boid there
         for (int y = 0; y < yCells; ++y) {                                                                  // if there is, it prints where and its id
-            for (int z = 0; z < zCells; ++z) {
+            for (int z = 0; z < zCells; ++z) {                                                              // not used unless bug appears
                 if (!boidGrid[x][y][z].empty()) {
                     std::cout << "Cell (" << x << ", " << y << ", " << z << ") contains:\n";
                     for (const Boid* boid : boidGrid[x][y][z]) {
