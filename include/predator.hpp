@@ -13,7 +13,6 @@ class Predator {
     threepp::Vector3 velocity;                                        // stores predator velocity
     threepp::Vector3 acceleration;                                    // stores predator acceleration
     int identifier;                                                   // identifier to make predators unique
-    int aggression;                                                   // agression level to modify attacking
     bool attacking;                                                   // boolean value if predator is currently attacking
     int sightAngle;                                                   // angle which predators can see boids
     int sightRange;                                                   // range which predators can see boids

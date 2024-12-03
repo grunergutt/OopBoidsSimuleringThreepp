@@ -56,11 +56,11 @@ int main() {
     auto scene = threepp::Scene::create();
     scene->background = threepp::Color::orange;
 
-    float AVBHW = arena.getArenaHeight();    //arenaVisualBorderHeightWidth
+    float AVBHW = arena.getArenaHeight() + 10;
 
-    threepp::Vector3 xWallPosition = threepp::Vector3(0, 0, -1*arena.getArenaHeight()/2);
-    threepp::Vector3 yWallPosition = threepp::Vector3(0, -1*arena.getArenaHeight() / 2, 0);
-    threepp::Vector3 zWallPosition = threepp::Vector3(-1*arena.getArenaHeight() / 2,0 , 0);
+    threepp::Vector3 xWallPosition = threepp::Vector3(0, 0, -1*arena.getArenaHeight()/2 - 5);
+    threepp::Vector3 yWallPosition = threepp::Vector3(0, -1*arena.getArenaHeight() / 2 - 5, 0);
+    threepp::Vector3 zWallPosition = threepp::Vector3(-1*arena.getArenaHeight() / 2 - 5,0, 0);
 
     auto groupWallBorders = threepp::Group::create();
     groupWallBorders->add(createBoxMesh(xWallPosition, threepp::Color::green, AVBHW, AVBHW, 0, true));
@@ -80,7 +80,6 @@ int main() {
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones1;
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones2;
     std::vector<std::shared_ptr<threepp::Mesh>> boidCones3;
-    std::vector<std::shared_ptr<threepp::Mesh>> boidCones4;
     std::vector<std::shared_ptr<threepp::Mesh>> predatorCones;
 
     auto flock1Group = createAnimationGroupForFlock(flock1, threepp::Color::yellow, boidCones1, 1);
@@ -105,8 +104,8 @@ int main() {
     float setAlignmentStrength = 0.15f, previousAlignmentStrength = setAlignmentStrength;
     float setCohesionStrength = 0.1f, previousCohesionStrength = setCohesionStrength;
     int setSeparationRadius = 10, previousSeparationRadius = setSeparationRadius;
-    int setAlignmentRadius = 15, previousAlignmentRadius = setAlignmentRadius;
-    int setCohesionRadius = 15, previousCohesionRadius = setCohesionRadius;
+    int setAlignmentRadius = 10, previousAlignmentRadius = setAlignmentRadius;
+    int setCohesionRadius = 10, previousCohesionRadius = setCohesionRadius;
 
     float setBoidSpeed = 20, previousBoidSpeed = setBoidSpeed;
     float setBoidForce = 4, previousBoidForce = setBoidForce;
@@ -128,6 +127,8 @@ int main() {
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
+        ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(430, 170), ImGuiCond_Once);
         ImGui::Begin("Flock Control Panel");
         ImGui::SliderFloat("separationStrength", &setSeparationStrength, 0.5, 4);
         ImGui::SliderFloat("alignmentStrength", &setAlignmentStrength, 0.01, 0.3);
@@ -185,6 +186,8 @@ int main() {
     }
         ImGui::End();
 
+        ImGui::SetNextWindowPos(ImVec2(0, 170), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(390, 100), ImGuiCond_Once);
         ImGui::Begin("Boid Control Panel");
         ImGui::SliderFloat("Max Speed", &setBoidSpeed, 5, 35);
         ImGui::SliderFloat("Max Force", &setBoidForce, 1, 7);
@@ -219,6 +222,8 @@ int main() {
 
         ImGui::End();
 
+        ImGui::SetNextWindowPos(ImVec2(0, 270), ImGuiCond_Always);
+        ImGui::SetNextWindowSize(ImVec2(180, 60), ImGuiCond_Once);
         ImGui::Begin("Predator Control Panel");
         ImGui::Checkbox("Simulate Predators", &simulatePredators);
 

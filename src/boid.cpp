@@ -5,7 +5,7 @@
 #include "utilityfunctions.hpp"
 #include <iostream>
 
-float borderInvisiblePercentage = 0.6;                                 // between 0 and 1
+float borderInvisiblePercentage = 0.8;                                 // between 0 and 1
 int speedForceRandomDampener = 100;
 
 Boid::Boid(int identifier, int sightRangeInitializer, bool outOfBoundsStatus,  bool boidScaredStatus,
