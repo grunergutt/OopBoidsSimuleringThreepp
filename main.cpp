@@ -15,13 +15,13 @@
 
 int main() {
 
-    int numberOfBoidsFlock1 = 140;
+    int numberOfBoidsFlock1 = 70;
     Flock flock1;
     for (int i = 0; i < numberOfBoidsFlock1; i++) {
         flock1.flockAddBoid(std::make_unique<Boid>(i));
     }
 
-    int numberOfBoidsFlock2 = 0;
+    int numberOfBoidsFlock2 = 70;
     Flock flock2;
     for (int i = 0; i < numberOfBoidsFlock2; i++) {
         flock2.flockAddBoid(std::make_unique<Boid>(i));

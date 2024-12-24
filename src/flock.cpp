@@ -13,6 +13,7 @@ threepp::Vector3 Flock::flockCalculateSeparation(const Boid& boid) {        // c
     for (const Boid* neighbor : arena.getNeighboringBoids(boid,
         separationRadius / arena.getCellSize())) {
 
+        if (count < 15){
         threepp::Vector3 displacement = boid.boidGetPosition() -            // uses boids and neighbors position to calculate a
             neighbor->boidGetPosition();                                    // repulsionforce based on distance
         float distance = displacement.length();
@@ -20,6 +21,7 @@ threepp::Vector3 Flock::flockCalculateSeparation(const Boid& boid) {        // c
             displacement.normalize();
             separationForce += (displacement) / (distance * distance);
             count++;                                                        // counts how many boids this is accounted for
+        }
         }
     }
     if (count > 0) {
@@ -34,11 +36,14 @@ threepp::Vector3 Flock::flockCalculateAlignment(const Boid& boid) {         // c
     int count = 0;                                                          // uses neighbors like separation does
     for (const Boid* neighbor : arena.getNeighboringBoids(boid,
         alignmentRadius / arena.getCellSize())) {
-        float distance = (boid.boidGetPosition() -
-            neighbor->boidGetPosition()).length();
-        if (distance < alignmentRadius) {
-            alignmentForce += neighbor->boidGetVelocity();
-            count++;
+
+        if (count < 15) {
+            float distance = (boid.boidGetPosition() -
+                neighbor->boidGetPosition()).length();
+            if (distance < alignmentRadius) {
+                alignmentForce += neighbor->boidGetVelocity();
+                count++;
+            }
         }
     }
     if (count > 0) {
@@ -57,11 +62,14 @@ threepp::Vector3 Flock::flockCalculateCohesion(const Boid& boid) {          // c
     int count = 0;                                                          // toward nearby boids using its neighbors.
     for (const Boid* neighbor : arena.getNeighboringBoids(boid,
         cohesionRadius / arena.getCellSize())) {
-        float distance = (boid.boidGetPosition() -
-            neighbor->boidGetPosition()).length();
-        if (distance < cohesionRadius) {
-            cohesionForce += neighbor->boidGetPosition();
-            count++;
+
+        if (count < 15) {
+            float distance = (boid.boidGetPosition() -
+                neighbor->boidGetPosition()).length();
+            if (distance < cohesionRadius) {
+                cohesionForce += neighbor->boidGetPosition();
+                count++;
+            }
         }
     }
     if (count > 0) {                                                        // gets the direction vector by normalizing

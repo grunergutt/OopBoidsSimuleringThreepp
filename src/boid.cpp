@@ -288,6 +288,3 @@ void Boid::boidSetMaxForce(float setMaxForce) {
 void Boid::boidSetRandomForce(float setRandomForce) {
     randomForceFactor = setRandomForce/speedForceRandomDampener;
 }
-
-
-
